@@ -6,33 +6,37 @@
 <title>Le monde en mécanismes — test</title>
 <link rel="icon" type="image/png" href="favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg: #ffffff;
     --panel: #f4f6fa;
-    --panel-hover: #eaeef5;
-    --line: #dde3ec;
+    --panel-hover: #eef2f8;
+    --line: #d9e1ea;
     --text: #1c2b3a;
     --text-dim: #64748b;
-    --accent: #8f5f1e;
-    --accent-ink: #1c2b3a;
-    --success: #15774d;
-    --success-bg: #eafaf1;
-    --error: #b8493a;
-    --error-bg: #fdefec;
+    --accent: #b6792a;
+    --accent-dark: #8a5a1c;
+    --accent-bg: #fdf3e4;
+    --accent-ink: #ffffff;
+    --success: #17a15c;
+    --success-dark: #0e7a45;
+    --success-bg: #e8faf0;
+    --error: #ea5b4a;
+    --error-dark: #c23f30;
+    --error-bg: #fdeceb;
   }
   * { box-sizing: border-box; }
   body {
     background: var(--bg);
     color: var(--text);
-    font-family: 'Inter', sans-serif;
+    font-family: 'Nunito', sans-serif;
     margin: 0;
-    padding: 40px 20px 80px;
+    padding: 28px 20px 80px;
     line-height: 1.55;
   }
   .wrap { max-width: 560px; margin: 0 auto; }
-  header { margin-bottom: 32px; }
+  header { margin-bottom: 24px; }
   .eyebrow {
     font-family: 'IBM Plex Mono', monospace;
     font-size: 13px;
@@ -40,8 +44,8 @@
     margin: 0 0 10px;
   }
   h1 {
-    font-family: 'IBM Plex Mono', monospace;
-    font-weight: 600;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 900;
     font-size: 28px;
     margin: 0 0 14px;
     letter-spacing: -0.01em;
@@ -52,189 +56,257 @@
   .screen { display: none; }
   .screen.active { display: block; }
 
+  /* héros d'intro : John + logo, façon carte Duolingo */
+  .intro-hero { display: flex; align-items: flex-end; gap: 14px; margin-bottom: 22px; }
+  .intro-john { width: 108px; height: auto; flex-shrink: 0; filter: drop-shadow(0 6px 10px rgba(28,43,58,0.12)); }
+  .intro-bubble {
+    position: relative;
+    background: var(--panel-hover);
+    border: 2px solid var(--line);
+    border-radius: 6px 22px 22px 22px;
+    padding: 18px 20px 16px;
+    flex: 1;
+  }
+  .intro-bubble::before {
+    content: "";
+    position: absolute;
+    left: -11px; top: 28px;
+    width: 0; height: 0;
+    border-top: 11px solid transparent;
+    border-bottom: 11px solid transparent;
+    border-right: 11px solid var(--panel-hover);
+  }
+  .intro-bubble::after {
+    content: "";
+    position: absolute;
+    left: -13px; top: 27px;
+    width: 0; height: 0;
+    border-top: 12px solid transparent;
+    border-bottom: 12px solid transparent;
+    border-right: 12px solid var(--line);
+    z-index: -1;
+  }
+  .intro-logo-badge {
+    position: absolute;
+    top: -16px; right: -8px;
+    width: 56px; height: 56px;
+    border-radius: 16px;
+    object-fit: cover;
+    border: 3px solid var(--bg);
+    box-shadow: 0 3px 0 var(--accent-dark), 0 4px 8px rgba(28,43,58,0.18);
+    transform: rotate(7deg);
+  }
+  .intro-bubble h1 { font-size: 19px; line-height: 1.25; margin: 0 20px 0 0; }
+
   .intro-text { color: var(--text-dim); font-size: 15px; max-width: 52ch; margin: 0 0 16px; }
-  .intro-text strong { color: var(--text); font-weight: 600; }
+  .intro-text strong { color: var(--text); font-weight: 800; }
   .cta {
-    margin-top: 24px;
+    display: block; width: 100%;
+    margin-top: 22px;
     background: var(--accent); color: var(--accent-ink);
-    border: none; border-radius: 4px; padding: 14px 30px;
-    font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600;
+    border: none; border-radius: 16px; padding: 16px 20px;
+    font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 800;
+    text-transform: uppercase; letter-spacing: 0.04em;
+    box-shadow: 0 4px 0 var(--accent-dark);
     cursor: pointer;
   }
-  .cta:hover { opacity: 0.88; }
-  .cta:disabled { opacity: 0.5; cursor: default; }
+  .cta:hover:not(:disabled) { filter: brightness(1.04); }
+  .cta:active:not(:disabled) { transform: translateY(3px); box-shadow: 0 1px 0 var(--accent-dark); }
+  .cta:disabled { opacity: 0.5; cursor: default; box-shadow: none; }
+
+  /* barre de progression façon Duolingo */
+  .progress-row { display: flex; align-items: center; gap: 14px; margin-bottom: 22px; }
+  .progress-close {
+    background: none; border: none; color: var(--text-dim);
+    font-size: 22px; line-height: 1; cursor: pointer; padding: 4px;
+    font-family: 'Nunito', sans-serif;
+  }
+  .progress-close:hover { color: var(--text); }
+  .progress-track {
+    flex: 1; height: 14px; background: var(--panel);
+    border-radius: 999px; overflow: hidden; border: 1px solid var(--line);
+  }
+  .progress-fill {
+    height: 100%; width: 0%; background: var(--accent);
+    border-radius: 999px; transition: width 0.35s ease;
+  }
+  .progress-count {
+    font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--text-dim);
+    white-space: nowrap;
+  }
 
   /* carte cause → effet du mécanisme, révélée après réponse */
   .mech-card {
     display: none;
-    margin-top: 12px;
-    border: 1px solid var(--accent);
-    border-radius: 4px;
-    padding: 10px 14px;
+    margin-top: 14px;
+    background: var(--accent-bg);
+    border: 2px solid var(--accent);
+    border-radius: 14px;
+    padding: 12px 16px;
   }
   .mech-card.show { display: block; }
   .mech-card-label {
     display: block;
     font-family: 'IBM Plex Mono', monospace; font-size: 10px;
-    color: var(--accent); text-transform: uppercase; letter-spacing: 0.04em;
+    color: var(--accent-dark); text-transform: uppercase; letter-spacing: 0.04em;
     margin-bottom: 5px;
   }
-  .mech-card p { margin: 0; font-size: 13px; color: var(--text); }
-  .mech-arrow { color: var(--accent); font-weight: 600; margin: 0 6px; }
+  .mech-card p { margin: 0; font-size: 13px; color: var(--text); font-weight: 700; }
+  .mech-arrow { color: var(--accent-dark); font-weight: 900; margin: 0 6px; }
 
-  .track { position: relative; padding-left: 28px; }
-  .track::before {
-    content: "";
-    position: absolute;
-    left: 8px; top: 6px; bottom: 6px;
-    width: 1px;
-    background: var(--line);
-  }
-  .node {
-    position: relative;
-    margin-bottom: 28px;
-  }
-  .node::before {
-    content: attr(data-n);
-    position: absolute;
-    left: -28px; top: 4px;
-    width: 17px; height: 17px;
-    border-radius: 50%;
-    background: var(--panel);
-    border: 1px solid var(--line);
-    color: var(--text-dim);
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 10px;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .node.done::before { border-color: var(--accent); color: var(--accent); }
+  #track { position: relative; }
 
-  .panel {
-    padding: 4px 0 32px;
-    display: none;
-  }
+  .panel { display: none; }
   .panel.active { display: block; }
   .tag {
     display: inline-block;
     font-family: 'IBM Plex Mono', monospace;
-    font-size: 11px;
-    color: var(--accent);
-    border: 1px solid var(--accent);
-    border-radius: 3px;
-    padding: 2px 7px;
-    margin-bottom: 12px;
+    font-size: 11px; font-weight: 700;
+    color: #fff;
+    background: var(--accent);
+    border-radius: 999px;
+    padding: 4px 12px;
+    margin-bottom: 14px;
   }
 
   /* le duo de présentateurs, façon Duolingo */
-  .presenter-row { display: flex; align-items: center; gap: 16px; margin-bottom: 18px; }
+  .presenter-row { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; }
   .presenter-avatar {
-    height: 96px; width: auto; max-width: 110px;
+    height: 116px; width: auto; max-width: 120px;
     object-fit: contain;
     flex-shrink: 0;
     display: block;
+    filter: drop-shadow(0 5px 8px rgba(28,43,58,0.12));
   }
   .presenter-bubble {
     position: relative;
     background: var(--panel-hover);
-    border: 1px solid var(--line);
-    border-radius: 4px 18px 18px 18px;
-    padding: 12px 16px;
+    border: 2px solid var(--line);
+    border-radius: 6px 22px 22px 22px;
+    padding: 14px 18px;
     flex: 1;
   }
   .presenter-bubble::before {
     content: "";
     position: absolute;
-    left: -9px; top: 26px;
+    left: -11px; top: 26px;
     width: 0; height: 0;
-    border-top: 9px solid transparent;
-    border-bottom: 9px solid transparent;
-    border-right: 9px solid var(--panel-hover);
+    border-top: 11px solid transparent;
+    border-bottom: 11px solid transparent;
+    border-right: 11px solid var(--panel-hover);
+  }
+  .presenter-bubble::after {
+    content: "";
+    position: absolute;
+    left: -13px; top: 25px;
+    width: 0; height: 0;
+    border-top: 12px solid transparent;
+    border-bottom: 12px solid transparent;
+    border-right: 12px solid var(--line);
+    z-index: -1;
   }
   .presenter-name {
-    font-family: 'IBM Plex Mono', monospace; font-size: 10px;
-    color: var(--accent); text-transform: uppercase; letter-spacing: 0.04em;
+    font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 700;
+    color: var(--accent-dark); text-transform: uppercase; letter-spacing: 0.04em;
     margin: 0 0 5px;
   }
 
   /* l'analyste répond de l'autre côté, face à John */
   .presenter-analyste { flex-direction: row-reverse; }
-  .presenter-analyste .presenter-bubble { border-radius: 18px 4px 18px 18px; }
+  .presenter-analyste .presenter-bubble { border-radius: 22px 6px 22px 22px; }
   .presenter-analyste .presenter-bubble::before {
-    left: auto; right: -9px;
+    left: auto; right: -11px;
     border-right: none;
-    border-left: 9px solid var(--panel-hover);
+    border-left: 11px solid var(--panel-hover);
   }
-  .result.correct .presenter-bubble { border-color: var(--success); }
-  .result.correct .presenter-name { color: var(--success); }
-  .result.incorrect .presenter-bubble { border-color: var(--error); }
-  .result.incorrect .presenter-name { color: var(--error); }
+  .presenter-analyste .presenter-bubble::after {
+    left: auto; right: -13px;
+    border-right: none;
+    border-left: 12px solid var(--line);
+  }
+  .result.correct .presenter-bubble { border-color: var(--success); background: var(--success-bg); }
+  .result.correct .presenter-bubble::before { border-right-color: var(--success-bg); border-left-color: var(--success-bg); }
+  .result.correct .presenter-bubble::after { border-right-color: var(--success); border-left-color: var(--success); }
+  .result.correct .presenter-name { color: var(--success-dark); }
+  .result.incorrect .presenter-bubble { border-color: var(--error); background: var(--error-bg); }
+  .result.incorrect .presenter-bubble::before { border-right-color: var(--error-bg); border-left-color: var(--error-bg); }
+  .result.incorrect .presenter-bubble::after { border-right-color: var(--error); border-left-color: var(--error); }
+  .result.incorrect .presenter-name { color: var(--error-dark); }
 
-  .situation, .explain { font-size: 16px; margin: 0; }
-  .explain { font-size: 14px; }
+  .situation, .explain { font-size: 16px; margin: 0; font-weight: 700; }
+  .explain { font-size: 14px; font-weight: 600; }
   .opt {
     display: block; width: 100%; text-align: left;
-    background: transparent; color: var(--text);
-    border: 1px solid var(--line); border-radius: 4px;
-    padding: 11px 14px; margin-bottom: 8px;
-    font-family: 'Inter', sans-serif; font-size: 14px;
+    background: #fff; color: var(--text);
+    border: 2px solid var(--line); border-radius: 16px;
+    padding: 14px 18px; margin-bottom: 10px;
+    font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 700;
+    box-shadow: 0 3px 0 var(--line);
     cursor: pointer;
   }
-  .opt:hover:not(:disabled) { background: var(--panel-hover); border-color: var(--accent); }
+  .opt:hover:not(:disabled) { border-color: var(--accent); background: var(--accent-bg); }
+  .opt:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 1px 0 var(--line); }
   .opt:disabled { cursor: default; }
-  .opt:disabled:not(.correct):not(.incorrect) { opacity: 0.55; }
-  .opt.correct { background: var(--success-bg); border-color: var(--success); color: var(--success); }
+  .opt:disabled:not(.correct):not(.incorrect) { opacity: 0.5; box-shadow: none; }
+  .opt.correct { background: var(--success-bg); border-color: var(--success); color: var(--success-dark); box-shadow: 0 3px 0 var(--success); }
   .opt.correct::before { content: "✓ "; }
-  .opt.incorrect { background: var(--error-bg); border-color: var(--error); color: var(--error); }
+  .opt.incorrect { background: var(--error-bg); border-color: var(--error); color: var(--error-dark); box-shadow: 0 3px 0 var(--error); }
   .opt.incorrect::before { content: "✗ "; }
   .choice-badge {
     display: block;
-    font-family: 'IBM Plex Mono', monospace; font-size: 10px;
-    color: var(--error); text-transform: uppercase; letter-spacing: 0.04em;
+    font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 700;
+    color: var(--error-dark); text-transform: uppercase; letter-spacing: 0.04em;
     margin: 0 0 4px;
   }
-  .result { margin-top: 14px; display: none; }
+  .result { margin-top: 16px; display: none; }
   .result.show { display: flex; }
   .next {
-    margin-top: 14px; background: var(--accent); color: var(--accent-ink);
-    border: none; border-radius: 4px; padding: 10px 18px;
-    font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600;
+    margin-top: 18px; width: 100%;
+    background: var(--accent); color: var(--accent-ink);
+    border: none; border-radius: 16px; padding: 15px 18px;
+    font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 800;
+    text-transform: uppercase; letter-spacing: 0.04em;
+    box-shadow: 0 4px 0 var(--accent-dark);
     cursor: pointer; display: none;
   }
-  .next.show { display: inline-block; }
+  .next.show { display: block; }
+  .next:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--accent-dark); }
 
-  #feedback { display: none; text-align: center; padding-top: 20px; }
+  #feedback { display: none; text-align: center; padding-top: 28px; }
   #feedback.show { display: block; }
-  #feedback h2 { font-family: 'IBM Plex Mono', monospace; font-size: 20px; }
-  .scale { display: flex; gap: 8px; justify-content: center; margin: 24px 0; }
+  #feedback h2 { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 20px; }
+  .scale { display: flex; gap: 8px; justify-content: center; margin: 24px 0; flex-wrap: wrap; }
   .scale button {
-    width: 44px; height: 44px; border-radius: 50%;
-    background: var(--panel); border: 1px solid var(--line); color: var(--text);
-    font-family: 'IBM Plex Mono', monospace; cursor: pointer;
+    width: 42px; height: 42px; border-radius: 50%;
+    background: #fff; border: 2px solid var(--line); color: var(--text);
+    font-family: 'Nunito', sans-serif; font-weight: 700; cursor: pointer;
+    box-shadow: 0 2px 0 var(--line);
   }
-  .scale button:hover { border-color: var(--accent); color: var(--accent); }
-  .thanks { color: var(--success); font-size: 14px; margin-top: 14px; display: none; }
+  .scale button:hover { border-color: var(--accent); color: var(--accent-dark); }
+  .scale button:active { transform: translateY(2px); box-shadow: none; }
+  .thanks { color: var(--success-dark); font-size: 14px; font-weight: 700; margin-top: 14px; display: none; }
   .thanks.show { display: block; }
 
   /* carte personnelle */
   #personalMap { display: none; text-align: center; padding-top: 8px; }
   #personalMap.show { display: block; }
-  #personalMap h2 { font-family: 'IBM Plex Mono', monospace; font-size: 20px; margin: 0 0 10px; }
+  #personalMap h2 { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 20px; margin: 0 0 10px; }
   .map-svg { width: 100%; max-width: 420px; height: auto; margin: 4px auto 22px; display: block; }
-  .map-edge { stroke: var(--line); stroke-width: 1.5; }
-  .map-edge-ghost { stroke: var(--line); stroke-width: 1.5; stroke-dasharray: 3 3; opacity: 0.5; }
-  .map-node circle { stroke-width: 2; }
-  .map-node-lit circle { fill: var(--accent); stroke: var(--accent); }
-  .map-node-lit text { fill: var(--text); font-family: 'IBM Plex Mono', monospace; font-size: 9px; text-anchor: middle; }
+  .map-edge { stroke: var(--line); stroke-width: 2; }
+  .map-edge-ghost { stroke: var(--line); stroke-width: 2; stroke-dasharray: 3 3; opacity: 0.6; }
+  .map-node circle { stroke-width: 2.5; }
+  .map-node-lit circle { fill: var(--accent); stroke: var(--accent-dark); }
+  .map-node-lit text { fill: var(--text); font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 9px; text-anchor: middle; }
   .map-node-ghost circle { fill: var(--panel); stroke: var(--line); stroke-dasharray: 2 2; }
-  .map-node-ghost text { fill: var(--text-dim); font-family: 'IBM Plex Mono', monospace; font-size: 8px; text-anchor: middle; }
+  .map-node-ghost text { fill: var(--text-dim); font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 8px; text-anchor: middle; }
   .map-callout {
-    text-align: left; background: var(--panel); border: 1px solid var(--line);
-    border-radius: 4px; padding: 14px 16px; margin: 0 auto 28px; max-width: 460px;
+    text-align: left; background: var(--panel); border: 2px solid var(--line);
+    border-radius: 16px; padding: 14px 16px; margin: 0 auto 28px; max-width: 460px;
   }
   .map-callout-tag {
-    display: inline-block; font-family: 'IBM Plex Mono', monospace; font-size: 10px;
-    color: var(--accent); border: 1px solid var(--accent); border-radius: 3px;
-    padding: 2px 7px; margin-bottom: 8px;
+    display: inline-block; font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 700;
+    color: #fff; background: var(--accent); border-radius: 999px;
+    padding: 3px 10px; margin-bottom: 8px;
   }
   .map-callout p { margin: 0; font-size: 13px; color: var(--text-dim); }
   .map-callout strong { color: var(--text); }
@@ -247,7 +319,13 @@
 
   <div id="intro" class="screen active">
     <p class="eyebrow">Avant de commencer</p>
-    <h1>100 mécanismes suffisent à comprendre le monde</h1>
+    <div class="intro-hero">
+      <img class="intro-john" src="john-intro-cutout.png" alt="John">
+      <div class="intro-bubble">
+        <img class="intro-logo-badge" src="favicon.png" alt="Logo 100 mécanismes">
+        <h1>100 mécanismes suffisent à comprendre le monde</h1>
+      </div>
+    </div>
     <p class="intro-text">Charlie Munger, l'associé de Warren Buffett pendant plus de 60 ans chez Berkshire Hathaway, a construit toute sa méthode d'investissement sur une conviction simple : il existe environ <strong>une centaine de « modèles mentaux »</strong> — des mécanismes qui reviennent sans cesse en économie, en droit, en climat, en technologie — et les connaître suffit à comprendre l'essentiel de ce qui se passe autour de soi, sans être expert de rien en particulier.</p>
     <p class="intro-text" id="introSample">Ce test t'en propose un échantillon, tiré de vraies actualités récentes collectées et rapprochées automatiquement chaque jour. Devine d'abord, comprends ensuite.</p>
     <button class="cta" id="startBtn" onclick="startQuiz()">Commencer</button>
@@ -255,13 +333,19 @@
 
   <div id="quizArea" class="screen">
 
+    <div class="progress-row">
+      <button class="progress-close" onclick="exitQuiz()" aria-label="Quitter">×</button>
+      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+      <span class="progress-count" id="progressCount">1/1</span>
+    </div>
+
     <header>
       <p class="eyebrow" id="quizEyebrow">Test — mécanismes condensés</p>
       <h1>Le monde en mécanismes</h1>
       <p class="sub" id="quizSub">Devine d'abord, comprends ensuite. En vrai, tu n'en verrais qu'une par jour — ici, elles sont enchaînées pour que tu te fasses une idée en quelques minutes.</p>
     </header>
 
-    <div class="track" id="track"></div>
+    <div id="track"></div>
 
     <div id="personalMap">
       <h2>Ta carte</h2>
@@ -285,13 +369,18 @@
 </div>
 
 <script>
-const AVATAR = { "John": "john-cutout.png", "Véronica": "veronica-cutout.png", "Dan": "dan-cutout.png" };
+const JOHN_VARIANTS = ["john-2-cutout.png", "john-3-cutout.png"];
+const AVATAR = { "John": "john-2-cutout.png", "Véronica": "veronica-cutout.png", "Dan": "dan-cutout.png" };
 let QUESTIONS = [];
 
 function escapeHtml(s) {
   const d = document.createElement('div');
   d.textContent = s || '';
   return d.innerHTML;
+}
+
+function johnAvatar() {
+  return JOHN_VARIANTS[Math.floor(Math.random() * JOHN_VARIANTS.length)];
 }
 
 async function loadEdition() {
@@ -324,6 +413,17 @@ function startQuiz() {
   buildTrack();
 }
 
+function exitQuiz() {
+  document.getElementById('quizArea').classList.remove('active');
+  document.getElementById('intro').classList.add('active');
+}
+
+function updateProgress(idx) {
+  const n = QUESTIONS.length;
+  document.getElementById('progressFill').style.width = `${(idx / n) * 100}%`;
+  document.getElementById('progressCount').textContent = `${idx}/${n}`;
+}
+
 function buildTrack() {
   const n = QUESTIONS.length;
   document.getElementById('quizEyebrow').textContent = `Test — ${n} mécanisme${n > 1 ? 's' : ''}, condensés`;
@@ -332,10 +432,11 @@ function buildTrack() {
 
   const track = document.getElementById('track');
   track.innerHTML = '';
+  updateProgress(1);
 
   QUESTIONS.forEach((q, idx) => {
     const i = idx + 1;
-    const askAvatar = AVATAR[q.presenter_ask] || AVATAR['John'];
+    const askAvatar = q.presenter_ask === 'John' ? johnAvatar() : (AVATAR[q.presenter_ask] || AVATAR['John']);
     const ansAvatar = AVATAR[q.presenter_answer] || AVATAR['Dan'];
     const tag = q.type === 'DILEMMA' ? `${q.category} — dilemme, pas de vérité fixe` : q.category;
 
@@ -348,35 +449,33 @@ function buildTrack() {
       ? `<p>${escapeHtml(ceCause)}<span class="mech-arrow">→</span>${escapeHtml(ceEffect)}</p>`
       : `<p>${escapeHtml(q.mechanism_label)}</p>`;
 
-    const node = document.createElement('div');
-    node.className = 'node' + (i === 1 ? ' active' : '');
-    node.dataset.n = i;
-    node.innerHTML = `
-      <div class="panel${i === 1 ? ' active' : ''}" id="p${i}">
-        <span class="tag">${escapeHtml(tag)}</span>
-        <div class="presenter-row presenter-rapporteur">
-          <img class="presenter-avatar" src="${askAvatar}" alt="${escapeHtml(q.presenter_ask)}">
-          <div class="presenter-bubble">
-            <p class="presenter-name">${escapeHtml(q.presenter_ask)}</p>
-            <p class="situation">${escapeHtml(q.situation)}</p>
-          </div>
+    const panel = document.createElement('div');
+    panel.className = 'panel' + (i === 1 ? ' active' : '');
+    panel.id = 'p' + i;
+    panel.innerHTML = `
+      <span class="tag">${escapeHtml(tag)}</span>
+      <div class="presenter-row presenter-rapporteur">
+        <img class="presenter-avatar" src="${askAvatar}" alt="${escapeHtml(q.presenter_ask)}">
+        <div class="presenter-bubble">
+          <p class="presenter-name">${escapeHtml(q.presenter_ask)}</p>
+          <p class="situation">${escapeHtml(q.situation)}</p>
         </div>
-        ${optionsHtml}
-        <div class="result presenter-row presenter-analyste" id="r${i}">
-          <img class="presenter-avatar" src="${ansAvatar}" alt="${escapeHtml(q.presenter_answer)}">
-          <div class="presenter-bubble">
-            <p class="presenter-name">${escapeHtml(q.presenter_answer)}</p>
-            <p class="explain" id="rtext${i}"></p>
-          </div>
-        </div>
-        <div class="mech-card" id="mechCard${i}">
-          <span class="mech-card-label">Mécanisme</span>
-          ${mechCardHtml}
-        </div>
-        <button class="next" id="n${i}" onclick="${i < QUESTIONS.length ? `go(${i + 1})` : 'finish()'}">${i < QUESTIONS.length ? 'Suivant' : 'Voir le bilan'}</button>
       </div>
+      ${optionsHtml}
+      <div class="result presenter-row presenter-analyste" id="r${i}">
+        <img class="presenter-avatar" src="${ansAvatar}" alt="${escapeHtml(q.presenter_answer)}">
+        <div class="presenter-bubble">
+          <p class="presenter-name">${escapeHtml(q.presenter_answer)}</p>
+          <p class="explain" id="rtext${i}"></p>
+        </div>
+      </div>
+      <div class="mech-card" id="mechCard${i}">
+        <span class="mech-card-label">Mécanisme</span>
+        ${mechCardHtml}
+      </div>
+      <button class="next" id="n${i}" onclick="${i < QUESTIONS.length ? `go(${i + 1})` : 'finish()'}">${i < QUESTIONS.length ? 'Suivant' : 'Voir le bilan'}</button>
     `;
-    track.appendChild(node);
+    track.appendChild(panel);
   });
 }
 
@@ -405,10 +504,8 @@ function answer(n, correct, btn) {
 
 function go(n) {
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.node').forEach(nd => nd.classList.remove('active'));
   document.getElementById('p' + n).classList.add('active');
-  document.querySelectorAll('.node')[n - 1].classList.add('active');
-  document.querySelectorAll('.node')[n - 2].classList.add('done');
+  updateProgress(n);
 }
 
 function buildPersonalMap() {
@@ -477,7 +574,7 @@ function buildPersonalMap() {
 }
 
 function finish() {
-  document.querySelectorAll('.node').forEach(nd => nd.classList.add('done'));
+  updateProgress(QUESTIONS.length);
   buildPersonalMap();
   document.getElementById('personalMap').classList.add('show');
   document.getElementById('feedback').classList.add('show');
