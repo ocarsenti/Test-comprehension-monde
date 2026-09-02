@@ -140,6 +140,7 @@ def export_public_edition(editions: dict, max_questions: int = MAX_PUBLIC_QUESTI
             "explanation": mechanism.explanation,
             "source": mechanism.source,
             "mechanism_label": mechanism.label,
+            "cause_effect": mechanism.cause_effect,
             "connects_to": neighbor_labels,
         })
 

@@ -4,12 +4,13 @@ Pool fixe des mécanismes du jeu.
 Fichier gravé dans le marbre (voir memoire projet) : le LLM (matcher.py,
 dresser.py) ne fait JAMAIS que choisir un id existant ici et l'habiller
 avec l'actualité du jour. Il ne peut ni inventer un mécanisme, ni modifier
-`explanation`/`source`.
+`explanation`/`source`/`cause_effect`.
 
 12 catégories, ~4 mécanismes chacune. `connects_to` porte de vraies
 relations causales (pas de la simple proximité thématique) — c'est ce
 graphe qui alimente l'écran "Ta carte" et les messages de réactivation
-croisée.
+croisée. `cause_effect` est le résumé court affiché sur la mech-card
+("X → Y"), distinct de `explanation` qui est plus long et pédagogique.
 """
 
 from dataclasses import dataclass, field
@@ -45,6 +46,7 @@ class Mechanism:
     explanation: str
     source: str
     mechanism_type: MechanismType
+    cause_effect: str  # résumé "cause → effet" affiché sur la mech-card, distinct de explanation (plus long)
     connects_to: list[str] = field(default_factory=list)
 
 
@@ -59,6 +61,7 @@ FULL_POOL: list[Mechanism] = [
         explanation="Une règle automatique déclenche la hausse dès que l'indice des prix à la consommation des 20% de ménages les plus modestes dépasse 2% par rapport à la dernière revalorisation — aucune décision politique n'est nécessaire.",
         source="Article L3231-4 du Code du travail français.",
         mechanism_type=MechanismType.FACT,
+        cause_effect="Inflation des 20% de ménages les plus modestes > 2%→hausse automatique du SMIC",
         connects_to=["nominal_vs_reel"],
     ),
     Mechanism(
@@ -69,6 +72,7 @@ FULL_POOL: list[Mechanism] = [
         explanation="Une hausse nominale (en euros affichés) ne dit rien du pouvoir d'achat réel tant qu'elle n'est pas comparée à l'inflation sur la même période — un salaire ou une pension peuvent progresser en façade et reculer en réalité.",
         source="Mécanisme économique général (comptabilité nationale).",
         mechanism_type=MechanismType.FACT,
+        cause_effect="Hausse nominale affichée→pouvoir d'achat réel pas forcément en hausse",
         connects_to=["smic_revalorisation_automatique", "inflation_importee"],
     ),
     Mechanism(
@@ -79,6 +83,7 @@ FULL_POOL: list[Mechanism] = [
         explanation="En rendant le crédit plus cher, la banque centrale ralentit délibérément la consommation et l'investissement — l'objectif est de faire baisser la demande, donc les prix, au prix d'une croissance plus faible à court terme.",
         source="Mécanisme de politique monétaire standard (type BCE/Fed).",
         mechanism_type=MechanismType.FACT,
+        cause_effect="Taux directeurs relevés→crédit plus cher, consommation freinée",
         connects_to=["dette_souveraine", "independance_banque_centrale"],
     ),
     Mechanism(
@@ -89,6 +94,7 @@ FULL_POOL: list[Mechanism] = [
         explanation="Quand une monnaie se déprécie ou qu'une matière première mondiale flambe, le renchérissement se répercute automatiquement sur les prix intérieurs, sans qu'aucune décision domestique n'en soit la cause.",
         source="Mécanisme macroéconomique standard (transmission des prix mondiaux).",
         mechanism_type=MechanismType.FACT,
+        cause_effect="Matière première ou devise qui flambe à l'étranger→prix intérieurs qui grimpent",
         connects_to=["nominal_vs_reel", "choc_matiere_premiere"],
     ),
     Mechanism(
@@ -99,6 +105,7 @@ FULL_POOL: list[Mechanism] = [
         explanation="Le taux auquel un État emprunte reflète la confiance des marchés dans sa capacité à rembourser — une dégradation de notation ou une hausse générale des taux renchérit mécaniquement le coût de toute nouvelle dette, y compris pour financer des dépenses déjà votées.",
         source="Mécanisme des marchés obligataires souverains.",
         mechanism_type=MechanismType.FACT,
+        cause_effect="Confiance des marchés dégradée→coût d'emprunt de l'État qui augmente",
         connects_to=["banque_centrale_taux", "vieillissement_demographique"],
     ),
 
@@ -111,6 +118,7 @@ FULL_POOL: list[Mechanism] = [
         explanation="Certaines décisions du Conseil de l'Union européenne — sanctions, fiscalité, politique étrangère — exigent l'unanimité des 27 pays membres. N'importe lequel peut donc bloquer un vote, même sans lien direct avec le fond, pour l'utiliser comme monnaie d'échange ailleurs.",
         source="Traités européens — règle de l'unanimité au Conseil.",
         mechanism_type=MechanismType.FACT,
+        cause_effect="Un seul pays membre s'oppose→décision européenne bloquée",
         connects_to=["vote_trilogue_delai"],
     ),
     Mechanism(
@@ -121,6 +129,7 @@ FULL_POOL: list[Mechanism] = [
         explanation="L'adoption d'un règlement européen suit une négociation à trois (Parlement, Conseil, Commission) puis prévoit presque toujours une période de transition avant application réelle — le vote médiatisé et l'entrée en vigueur effective sont deux moments distincts, parfois séparés de plusieurs années.",
         source="Procédure législative ordinaire de l'Union européenne.",
         mechanism_type=MechanismType.FACT,
+        cause_effect="Texte européen adopté→application réelle des années plus tard",
         connects_to=["veto_unanimite_conseil_ue", "referendum_ratification"],
     ),
     Mechanism(
@@ -131,6 +140,7 @@ FULL_POOL: list[Mechanism] = [
         explanation="Décarboner tout de suite coûte cher et certain ; ne rien faire expose à un risque croissant mais incertain dans son ampleur et son calendrier. Aucune des deux voies n'est \"la bonne réponse\" universelle — l'issue dépend de décisions politiques futures.",
         source="Règlement (UE) 2023/956 — mécanisme d'ajustement carbone aux frontières.",
         mechanism_type=MechanismType.DILEMMA,
+        cause_effect="Taxe carbone aux frontières→arbitrage décarboner tout de suite ou risquer plus tard",
         connects_to=["choc_matiere_premiere"],
     ),
     Mechanism(
@@ -141,6 +151,7 @@ FULL_POOL: list[Mechanism] = [
         explanation="Le statut d'indépendance protège la banque centrale des pressions politiques de court terme — l'objectif est d'empêcher qu'un gouvernement finance ses dépenses en imprimant de la monnaie, au prix de devoir composer avec une politique monétaire qu'il ne contrôle pas.",
         source="Mécanisme institutionnel standard (type statut BCE/Fed).",
         mechanism_type=MechanismType.FACT,
+        cause_effect="Statut d'indépendance→gouvernement ne peut pas dicter la politique monétaire",
         connects_to=["banque_centrale_taux"],
     ),
     Mechanism(
@@ -151,6 +162,7 @@ FULL_POOL: list[Mechanism] = [
         explanation="Certains traités internationaux ou européens exigent une ratification nationale, parfois par référendum — un résultat négatif dans un seul pays peut suspendre ou faire échouer un accord conclu par tous les autres.",
         source="Mécanisme constitutionnel de ratification (variable selon les pays).",
         mechanism_type=MechanismType.FACT,
+        cause_effect="Référendum national négatif→accord international suspendu pour tous",
         connects_to=["vote_trilogue_delai"],
     ),
 
@@ -163,6 +175,7 @@ FULL_POOL: list[Mechanism] = [
         explanation="Face à un droit de douane, une entreprise importatrice répercute typiquement une partie du surcoût sur ses prix et/ou cherche un fournisseur alternatif — la rétorsion du pays visé suit souvent, comme levier de négociation.",
         source="Mécanisme standard de politique commerciale (droits de douane).",
         mechanism_type=MechanismType.FACT,
+        cause_effect="Droit de douane imposé→prix répercuté ou fournisseur changé",
         connects_to=["repercussion_transport_prix", "substitution_fournisseur", "sanctions_economiques_ricochet"],
     ),
     Mechanism(
@@ -173,6 +186,7 @@ FULL_POOL: list[Mechanism] = [
         explanation="Le coût du transport est intégré au prix final à chaque étape de la chaîne — un blocage portuaire, une hausse du carburant ou un détour de route se répercute mécaniquement jusqu'au consommateur, même sans lien apparent avec le produit lui-même.",
         source="Mécanisme standard de chaîne logistique.",
         mechanism_type=MechanismType.FACT,
+        cause_effect="Coût de transport en hausse→prix final répercuté jusqu'au consommateur",
         connects_to=["droits_douane_guerre_commerciale", "choc_matiere_premiere", "couloir_maritime_strategique"],
     ),
     Mechanism(
@@ -183,6 +197,7 @@ FULL_POOL: list[Mechanism] = [
         explanation="Quand un fournisseur devient trop coûteux ou trop risqué (droit de douane, sanction, rupture politique), une entreprise cherche un substitut — au prix d'une renégociation, d'une perte de qualité ou d'un délai, rarement sans coût.",
         source="Mécanisme standard de gestion de chaîne d'approvisionnement.",
         mechanism_type=MechanismType.FACT,
+        cause_effect="Fournisseur devenu trop risqué ou cher→recherche d'un substitut",
         connects_to=["droits_douane_guerre_commerciale"],
     ),
     Mechanism(
@@ -193,6 +208,7 @@ FULL_POOL: list[Mechanism] = [
         explanation="Un embargo bilatéral n'empêche pas un flux de transiter par un pays tiers non soumis à la même restriction — le volume de commerce de ce pays intermédiaire grimpe alors de façon disproportionnée, signe indirect du contournement.",
         source="Mécanisme standard de contournement des sanctions commerciales.",
         mechanism_type=MechanismType.FACT,
+        cause_effect="Embargo bilatéral→flux détourné via un pays tiers",
         connects_to=["extraterritorialite_droit", "couloir_maritime_strategique"],
     ),
 
@@ -205,6 +221,7 @@ FULL_POOL: list[Mechanism] = [
         explanation="Quand le rapport entre actifs cotisants et retraités se dégrade année après année, les dépenses sociales augmentent mécaniquement à règles inchangées — la pression budgétaire vient de la structure de la population, pas d'une décision politique.",
         source="Mécanisme démographique structurel.",
         mechanism_type=MechanismType.FACT,
+        cause_effect="Rapport actifs/retraités qui se dégrade→dépenses sociales en hausse mécanique",
         connects_to=["dette_souveraine"],
     ),
     Mechanism(
@@ -215,6 +232,7 @@ FULL_POOL: list[Mechanism] = [
         explanation="Dans de nombreux pays en développement, les sommes envoyées par les travailleurs expatriés à leur famille dépassent en volume l'aide publique au développement reçue — une crise économique dans le pays d'accueil des migrants se répercute donc directement sur le pays d'origine.",
         source="Mécanisme économique standard (Banque mondiale, données remittances).",
         mechanism_type=MechanismType.FACT,
+        cause_effect="Crise économique chez les migrants→recul direct des transferts vers le pays d'origine",
         connects_to=["crise_accueil_migratoire"],
     ),
     Mechanism(
@@ -225,6 +243,7 @@ FULL_POOL: list[Mechanism] = [
         explanation="Quand les opportunités économiques se concentrent en ville, la population rurale s'y déplace plus vite que la capacité des infrastructures (logement, eau, transport) à absorber cet afflux — d'où des quartiers informels qui se construisent en dehors de toute planification.",
         source="Mécanisme démographique standard (transition urbaine).",
         mechanism_type=MechanismType.FACT,
+        cause_effect="Opportunités concentrées en ville→urbanisation plus rapide que les infrastructures",
         connects_to=["habitat_informel_risque"],
     ),
     Mechanism(
@@ -235,6 +254,7 @@ FULL_POOL: list[Mechanism] = [
         explanation="Accueillir au-delà de la capacité d'intégration crée des tensions sociales et budgétaires ; refuser expose à un coût humain et à un report de la pression sur d'autres pays. Aucune des deux options n'est universellement \"la bonne\" — l'équilibre dépend de choix politiques et de moyens disponibles.",
         source="Mécanisme institutionnel standard (politique migratoire).",
         mechanism_type=MechanismType.DILEMMA,
+        cause_effect="Afflux migratoire soudain→arbitrage entre tension sociale et coût humain du refus",
         connects_to=["remittances_developpement"],
     ),
 
@@ -247,6 +267,7 @@ FULL_POOL: list[Mechanism] = [
         explanation="Une sanction économique coupe des flux commerciaux ou financiers dans les deux sens — les entreprises du pays qui sanctionne perdent aussi un débouché ou un fournisseur, ce qui explique pourquoi les sanctions les plus dures s'accompagnent souvent de mesures de compensation interne.",
         source="Mécanisme standard de sanctions économiques internationales.",
         mechanism_type=MechanismType.FACT,
+        cause_effect="Sanction imposée à un pays→effet de ricochet chez les alliés de qui sanctionne",
         connects_to=["droits_douane_guerre_commerciale", "alliance_defense_collective"],
     ),
     Mechanism(
@@ -257,6 +278,7 @@ FULL_POOL: list[Mechanism] = [
         explanation="Une clause de défense mutuelle (type article 5 de l'OTAN) transforme une agression bilatérale en engagement collectif — l'objectif est de rendre l'attaque d'un membre trop coûteuse pour être tentée, au prix d'un risque d'escalade partagé par tous les signataires.",
         source="Mécanisme standard des traités de défense collective.",
         mechanism_type=MechanismType.FACT,
+        cause_effect="Attaque contre un membre→engagement automatique de toute l'alliance",
         connects_to=["sanctions_economiques_ricochet"],
     ),
     Mechanism(
@@ -267,6 +289,7 @@ FULL_POOL: list[Mechanism] = [
         explanation="Une part disproportionnée du commerce mondial (pétrole, conteneurs) transite par un petit nombre de détroits ou canaux — leur blocage, même bref, renchérit immédiatement le fret et les prix de l'énergie bien au-delà de la zone concernée.",
         source="Mécanisme standard de géographie du commerce maritime mondial.",
         mechanism_type=MechanismType.FACT,
+        cause_effect="Détroit stratégique bloqué→prix de l'énergie qui grimpe loin de la zone",
         connects_to=["embargo_contournement", "repercussion_transport_prix"],
     ),
     Mechanism(
@@ -277,6 +300,7 @@ FULL_POOL: list[Mechanism] = [
         explanation="Se rapprocher d'une puissance apporte des financements ou une protection immédiats, au prix d'une dépendance et d'une hostilité de l'autre camp ; rester neutre évite de choisir, mais prive des deux soutiens. Il n'y a pas d'issue sans compromis, seulement des paris différents.",
         source="Mécanisme géopolitique standard (compétition d'influence régionale).",
         mechanism_type=MechanismType.DILEMMA,
+        cause_effect="Rapprochement avec une puissance→dépendance et hostilité de l'autre camp",
         connects_to=["desinformation_viralite"],
     ),
 
@@ -289,6 +313,7 @@ FULL_POOL: list[Mechanism] = [
         explanation="La mousson est un système de pluie saisonnier récurrent et prévisible dans son principe — c'est son intensité, variable d'une année à l'autre selon des facteurs océaniques et atmosphériques, qui fait la différence entre une saison normale et une catastrophe.",
         source="Mécanisme climatologique général (systèmes de mousson).",
         mechanism_type=MechanismType.FACT,
+        cause_effect="Intensité de la mousson qui varie→crue plus ou moins dévastatrice",
         connects_to=["vulnerabilite_differenciee_catastrophe", "secheresse_recurrente"],
     ),
     Mechanism(
@@ -299,6 +324,7 @@ FULL_POOL: list[Mechanism] = [
         explanation="Le long d'une frontière de plaques tectoniques en subduction, la contrainte s'accumule en continu et se libère par à-coups — la récurrence des séismes majeurs y est statistiquement prévisible sur le temps long, mais leur déclenchement précis reste imprévisible.",
         source="Mécanisme géologique standard (tectonique des plaques).",
         mechanism_type=MechanismType.FACT,
+        cause_effect="Contrainte tectonique accumulée→séisme récurrent mais imprévisible dans le détail",
         connects_to=["vulnerabilite_differenciee_catastrophe"],
     ),
     Mechanism(
@@ -309,6 +335,7 @@ FULL_POOL: list[Mechanism] = [
         explanation="La hausse progressive du niveau moyen des mers réduit la marge entre une marée ordinaire et le seuil d'inondation — des événements autrefois rares (grande marée, tempête modérée) suffisent désormais à provoquer des débordements qu'ils ne provoquaient pas auparavant.",
         source="Mécanisme climatologique standard (élévation du niveau marin).",
         mechanism_type=MechanismType.FACT,
+        cause_effect="Niveau moyen des mers qui monte→inondations côtières plus fréquentes",
         connects_to=["zone_inondable_urbanisation"],
     ),
     Mechanism(
@@ -319,6 +346,7 @@ FULL_POOL: list[Mechanism] = [
         explanation="Un déficit hydrique se construit sur plusieurs années : les nappes et réservoirs ne se rechargent pas totalement d'une saison à l'autre si les précipitations sont même légèrement sous la normale de façon répétée — l'effet est cumulatif, pas visible sur une seule année isolée.",
         source="Mécanisme hydrologique standard (bilan hydrique cumulatif).",
         mechanism_type=MechanismType.FACT,
+        cause_effect="Déficit hydrique cumulé sur plusieurs années→sécheresse même sans année exceptionnelle",
         connects_to=["variabilite_mousson", "canicule_urbaine_ilot_chaleur"],
     ),
 
@@ -331,6 +359,7 @@ FULL_POOL: list[Mechanism] = [
         explanation="L'ampleur des dégâts d'une catastrophe dépend autant de la vulnérabilité du territoire (qualité du bâti, systèmes d'alerte, moyens de secours) que de l'intensité de l'aléa lui-même — deux pays frappés par un phénomène équivalent peuvent connaître des bilans très différents.",
         source="Mécanisme standard de gestion des risques de catastrophe (couple aléa/vulnérabilité).",
         mechanism_type=MechanismType.FACT,
+        cause_effect="Vulnérabilité du territoire→dégâts très différents à aléa comparable",
         connects_to=["variabilite_mousson", "zone_inondable_urbanisation", "habitat_informel_risque", "subduction_sismique"],
     ),
     Mechanism(
@@ -341,6 +370,7 @@ FULL_POOL: list[Mechanism] = [
         explanation="Toutes les organisations qui utilisent le même composant technique, même sans le savoir, se retrouvent exposées en même temps dès qu'une faille y est découverte — la mutualisation d'un composant mutualise aussi le risque qu'il porte.",
         source="Mécanisme standard de sécurité des chaînes logicielles (composants partagés).",
         mechanism_type=MechanismType.FACT,
+        cause_effect="Faille dans un composant partagé→exposition simultanée de tous ses utilisateurs",
         connects_to=[],
     ),
     Mechanism(
@@ -351,6 +381,7 @@ FULL_POOL: list[Mechanism] = [
         explanation="Construire sur une zone naturellement inondable (ancien lit de rivière, zone d'expansion de crue) supprime l'espace où l'eau se répandait sans dégâts — le risque n'a pas augmenté dans l'absolu, mais l'exposition humaine et matérielle à ce risque, si.",
         source="Mécanisme standard d'aménagement du territoire et risque inondation.",
         mechanism_type=MechanismType.FACT,
+        cause_effect="Construction en zone inondable→exposition humaine au risque, pas le risque lui-même",
         connects_to=["vulnerabilite_differenciee_catastrophe", "elevation_niveau_mer"],
     ),
     Mechanism(
@@ -361,6 +392,7 @@ FULL_POOL: list[Mechanism] = [
         explanation="Les quartiers informels se construisent souvent sur les terrains les moins chers — donc les plus exposés (pentes instables, zones inondables) — avec des matériaux moins résistants et sans accès prioritaire aux systèmes d'alerte, ce qui concentre mécaniquement le risque sur leurs habitants.",
         source="Mécanisme standard de vulnérabilité urbaine (habitat informel).",
         mechanism_type=MechanismType.FACT,
+        cause_effect="Terrain le moins cher, donc le plus exposé→risque concentré sur l'habitat informel",
         connects_to=["exode_rural", "vulnerabilite_differenciee_catastrophe"],
     ),
 
@@ -373,6 +405,7 @@ FULL_POOL: list[Mechanism] = [
         explanation="Chaque usage d'un antibiotique élimine les bactéries sensibles et laisse survivre celles porteuses d'une résistance, qui se multiplient alors sans concurrence — plus l'usage est fréquent ou incomplet, plus la sélection de souches résistantes s'accélère.",
         source="Mécanisme standard de sélection naturelle (résistance antimicrobienne).",
         mechanism_type=MechanismType.FACT,
+        cause_effect="Usage fréquent d'un antibiotique→sélection des souches résistantes",
         connects_to=["zoonose_transmission"],
     ),
     Mechanism(
@@ -383,6 +416,7 @@ FULL_POOL: list[Mechanism] = [
         explanation="Un agent pathogène franchit la barrière d'espèce quand le contact entre humains et une population animale infectée s'intensifie (déforestation, élevage intensif, commerce d'animaux sauvages) — plus ce contact est fréquent, plus la probabilité d'un tel saut augmente.",
         source="Mécanisme standard d'épidémiologie (maladies zoonotiques).",
         mechanism_type=MechanismType.FACT,
+        cause_effect="Contact intensifié humains/animaux→franchissement de la barrière d'espèce",
         connects_to=["resistance_antibiotique", "epidemie_saisonniere"],
     ),
     Mechanism(
@@ -393,6 +427,7 @@ FULL_POOL: list[Mechanism] = [
         explanation="Certains virus se transmettent mieux dans des conditions saisonnières précises (température, humidité, temps passé en intérieur) — la récurrence annuelle est prévisible dans son principe, mais son ampleur dépend de la souche circulante et de l'immunité collective du moment.",
         source="Mécanisme standard d'épidémiologie saisonnière.",
         mechanism_type=MechanismType.FACT,
+        cause_effect="Conditions saisonnières propices→récurrence annuelle d'intensité variable",
         connects_to=["zoonose_transmission"],
     ),
     Mechanism(
@@ -403,6 +438,7 @@ FULL_POOL: list[Mechanism] = [
         explanation="Une espèce introduite sans son cortège de prédateurs ou de parasites naturels peut proliférer sans contrôle et déséquilibrer une chaîne alimentaire entière — y compris les pollinisateurs ou prédateurs naturels dont dépendait une culture agricole.",
         source="Mécanisme standard d'écologie des invasions biologiques.",
         mechanism_type=MechanismType.FACT,
+        cause_effect="Espèce introduite sans prédateur naturel→chaîne alimentaire déséquilibrée",
         connects_to=["pollinisateurs_dependance_agricole"],
     ),
 
@@ -415,6 +451,7 @@ FULL_POOL: list[Mechanism] = [
         explanation="Une matière première entre dans la fabrication d'un grand nombre de produits finis différents — un choc sur son prix ou sa disponibilité (climat, conflit, épuisement) se propage donc à toute une chaîne de produits sans rapport apparent entre eux.",
         source="Mécanisme standard de marché des matières premières.",
         mechanism_type=MechanismType.FACT,
+        cause_effect="Choc sur une matière première→prix répercuté sur toute une chaîne de produits",
         connects_to=["cbam_dilemme_strategique", "repercussion_transport_prix", "surexploitation_ressource", "inflation_importee"],
     ),
     Mechanism(
@@ -425,6 +462,7 @@ FULL_POOL: list[Mechanism] = [
         explanation="Quand une ressource est partagée sans limite individuelle contraignante (un stock de poisson, une nappe phréatique), chaque acteur a intérêt à en prélever le plus possible avant les autres — un comportement rationnel à l'échelle individuelle qui conduit collectivement à l'épuisement de la ressource.",
         source="Mécanisme économique standard (tragédie des biens communs).",
         mechanism_type=MechanismType.FACT,
+        cause_effect="Ressource commune sans limite individuelle→épuisement collectif malgré des comportements rationnels",
         connects_to=["choc_matiere_premiere", "obsolescence_programmee_reglementee"],
     ),
     Mechanism(
@@ -435,6 +473,7 @@ FULL_POOL: list[Mechanism] = [
         explanation="Une part importante des cultures dépend de la pollinisation par des insectes — un déclin de leurs populations, causé par des facteurs parfois éloignés (pesticides, perte d'habitat, maladie), réduit directement le rendement de ces cultures, sans lien de cause à effet visible sur le terrain agricole lui-même.",
         source="Mécanisme standard d'écologie agricole (services de pollinisation).",
         mechanism_type=MechanismType.FACT,
+        cause_effect="Déclin des pollinisateurs→rendement agricole en baisse, sans lien visible sur le terrain",
         connects_to=["espece_invasive_ecosysteme"],
     ),
     Mechanism(
@@ -445,6 +484,7 @@ FULL_POOL: list[Mechanism] = [
         explanation="Le bitume, le béton et l'absence de végétation stockent la chaleur le jour et la restituent lentement la nuit — un centre-ville minéralisé peut ainsi rester plusieurs degrés plus chaud que sa périphérie végétalisée, surtout après le coucher du soleil.",
         source="Mécanisme standard de climatologie urbaine (îlot de chaleur).",
         mechanism_type=MechanismType.FACT,
+        cause_effect="Bitume et béton sans végétation→chaleur stockée puis restituée la nuit",
         connects_to=["secheresse_recurrente"],
     ),
 
@@ -457,6 +497,7 @@ FULL_POOL: list[Mechanism] = [
         explanation="De nombreuses entreprises hébergent leurs services chez un petit nombre de grands fournisseurs cloud — une panne chez l'un d'eux se répercute simultanément sur tous ses clients, quels que soient leurs secteurs d'activité respectifs.",
         source="Mécanisme standard d'infrastructure informatique (concentration cloud).",
         mechanism_type=MechanismType.FACT,
+        cause_effect="Panne chez un grand fournisseur cloud→services multiples touchés au même moment",
         connects_to=["cybersecurite_chaine_approvisionnement"],
     ),
     Mechanism(
@@ -467,6 +508,7 @@ FULL_POOL: list[Mechanism] = [
         explanation="Allonger la durée de vie d'un produit réduit son impact environnemental et son coût total pour l'utilisateur, mais augmente son prix de conception et réduit le renouvellement du marché — il n'existe pas de choix sans compromis entre accessibilité immédiate et durabilité.",
         source="Mécanisme économique standard (cycle de vie produit).",
         mechanism_type=MechanismType.DILEMMA,
+        cause_effect="Produit conçu pour durer plus longtemps→coût de conception plus élevé, marché renouvelé plus lentement",
         connects_to=["surexploitation_ressource"],
     ),
     Mechanism(
@@ -477,6 +519,7 @@ FULL_POOL: list[Mechanism] = [
         explanation="Un attaquant qui ne parvient pas à percer les défenses d'une cible directe peut viser un fournisseur ou prestataire moins protégé mais ayant un accès légitime à cette cible — la sécurité d'une organisation dépend alors aussi de celle de tous ses partenaires techniques.",
         source="Mécanisme standard de cybersécurité (attaque supply chain).",
         mechanism_type=MechanismType.FACT,
+        cause_effect="Prestataire tiers moins protégé mais avec accès légitime→porte d'entrée vers la cible réelle",
         connects_to=["dependance_fournisseur_cloud_unique"],
     ),
 
@@ -489,6 +532,7 @@ FULL_POOL: list[Mechanism] = [
         explanation="La première valeur mise sur la table sert de point de référence inconscient pour tout le reste de la négociation — même quand elle est reconnue comme arbitraire, elle influence durablement où se situe l'accord final.",
         source="Mécanisme standard de psychologie cognitive (biais d'ancrage).",
         mechanism_type=MechanismType.FACT,
+        cause_effect="Premier chiffre annoncé→point de référence qui influence tout l'accord final",
         connects_to=["aversion_perte_investissement"],
     ),
     Mechanism(
@@ -499,6 +543,7 @@ FULL_POOL: list[Mechanism] = [
         explanation="La perception qu'une opportunité va disparaître déclenche une prise de décision plus rapide et moins réfléchie — le mécanisme fonctionne même quand la rareté annoncée est partiellement artificielle, ce qui explique son usage répandu en marketing comme en diplomatie.",
         source="Mécanisme standard de psychologie de la décision (rareté perçue).",
         mechanism_type=MechanismType.FACT,
+        cause_effect="Opportunité perçue comme limitée dans le temps→décision plus rapide, moins réfléchie",
         connects_to=[],
     ),
     Mechanism(
@@ -509,6 +554,7 @@ FULL_POOL: list[Mechanism] = [
         explanation="La douleur ressentie face à une perte pèse psychologiquement plus lourd que le plaisir d'un gain équivalent — ce déséquilibre pousse à poursuivre un projet perdant pour \"ne pas avoir perdu pour rien\", alors que l'argent déjà dépensé ne devrait, rationnellement, plus entrer dans la décision.",
         source="Mécanisme standard de psychologie de la décision (aversion à la perte).",
         mechanism_type=MechanismType.FACT,
+        cause_effect="Argent déjà investi→poursuite d'un projet perdant pour ne pas 'perdre pour rien'",
         connects_to=["biais_ancrage_negociation"],
     ),
     Mechanism(
@@ -519,6 +565,7 @@ FULL_POOL: list[Mechanism] = [
         explanation="Un contenu qui déclenche une émotion forte (surprise, indignation) se partage plus spontanément qu'un contenu factuel neutre — un démenti, plus posé, touche structurellement moins de monde et arrive presque toujours après que la fausse version s'est déjà installée dans l'opinion.",
         source="Mécanisme standard de diffusion de l'information sur les réseaux (viralité asymétrique).",
         mechanism_type=MechanismType.FACT,
+        cause_effect="Contenu qui déclenche une émotion forte→partage plus rapide qu'un démenti factuel",
         connects_to=["course_influence_regionale"],
     ),
 
@@ -531,6 +578,7 @@ FULL_POOL: list[Mechanism] = [
         explanation="Dans les systèmes qui reconnaissent la force du précédent, une décision de justice ne tranche pas seulement le cas jugé — elle devient une référence que les juridictions inférieures doivent suivre dans des affaires similaires, ce qui démultiplie sa portée bien au-delà des parties initiales.",
         source="Mécanisme standard de droit jurisprudentiel.",
         mechanism_type=MechanismType.FACT,
+        cause_effect="Décision de justice sur un cas→référence contraignante pour les cas similaires",
         connects_to=["class_action_collective"],
     ),
     Mechanism(
@@ -541,6 +589,7 @@ FULL_POOL: list[Mechanism] = [
         explanation="Certaines lois s'appliquent à toute entité qui touche, même indirectement, au marché ou à la monnaie d'un pays (transaction en dollars, présence d'un client local) — une entreprise étrangère peut donc se retrouver soumise à un droit qu'elle n'a jamais choisi.",
         source="Mécanisme standard de droit international (compétence extraterritoriale).",
         mechanism_type=MechanismType.FACT,
+        cause_effect="Transaction touchant un marché ou une monnaie→droit étranger applicable même sans présence locale",
         connects_to=["embargo_contournement"],
     ),
     Mechanism(
@@ -551,6 +600,7 @@ FULL_POOL: list[Mechanism] = [
         explanation="Une action collective mutualise les coûts et augmente le rapport de force face à un défendeur puissant, mais dilue l'indemnisation individuelle et allonge les délais ; les procès séparés permettent une réparation ciblée mais restent hors de portée financière pour beaucoup de victimes isolées.",
         source="Mécanisme standard de procédure civile (action de groupe).",
         mechanism_type=MechanismType.DILEMMA,
+        cause_effect="Préjudice de masse→arbitrage entre réparation collective diluée et procès individuels hors de portée",
         connects_to=["jurisprudence_precedent_contraignant", "prescription_delai_recours"],
     ),
     Mechanism(
@@ -561,6 +611,7 @@ FULL_POOL: list[Mechanism] = [
         explanation="Le droit fixe des délais au-delà desquels une action en justice n'est plus recevable, pour garantir une sécurité juridique et la fiabilité des preuves dans le temps — un fait établi ne suffit donc pas toujours à obtenir réparation si le délai de prescription est dépassé.",
         source="Mécanisme standard de procédure juridique (prescription).",
         mechanism_type=MechanismType.FACT,
+        cause_effect="Délai de prescription dépassé→fait établi mais recours devenu irrecevable",
         connects_to=["class_action_collective"],
     ),
 ]
