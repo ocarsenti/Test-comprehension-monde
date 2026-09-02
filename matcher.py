@@ -13,12 +13,13 @@ CE QU'IL N'A JAMAIS LE DROIT DE FAIRE :
   lui-même) qui tranche
 """
 
-import os
 import json
 from anthropic import Anthropic
 from mechanisms_pool import FULL_POOL, Mechanism
 
-client = Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
+client = Anthropic()  # lit ANTHROPIC_API_KEY dans l'environnement
+
+MODEL = "claude-opus-5"
 
 CONFIDENCE_THRESHOLD = 0.7  # en dessous, la scène part en revue humaine
 
@@ -52,8 +53,9 @@ def match_headlines_to_mechanism(headlines: list, pool: list[Mechanism] = FULL_P
     ]
 
     response = client.messages.create(
-        model="claude-sonnet-4-6",
-        max_tokens=400,
+        model=MODEL,
+        max_tokens=1000,
+        output_config={"effort": "low"},  # simple classification, pas besoin de raisonnement profond
         system=MATCH_SYSTEM_PROMPT,
         messages=[{
             "role": "user",
@@ -62,7 +64,9 @@ def match_headlines_to_mechanism(headlines: list, pool: list[Mechanism] = FULL_P
         }],
     )
 
-    raw = response.content[0].text.strip()
+    raw = next(b.text for b in response.content if b.type == "text").strip()
+    if raw.startswith("```"):
+        raw = raw.strip("`").removeprefix("json").strip()
     result = json.loads(raw)
 
     # Garde-fou : un mechanism_id halluciné (hors pool) est rejeté ici,

@@ -11,12 +11,13 @@ le risque) doit être fournie séparément et validée avant publication —
 jamais laissée au jugement du LLM seul.
 """
 
-import os
 import json
 from anthropic import Anthropic
 from mechanisms_pool import Mechanism, MechanismType
 
-client = Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
+client = Anthropic()  # lit ANTHROPIC_API_KEY dans l'environnement
+
+MODEL = "claude-opus-5"
 
 DRESS_SYSTEM_PROMPT = """Tu habilles narrativement l'édition du jour d'un jeu de compréhension du monde.
 
@@ -48,13 +49,17 @@ def dress_edition(mechanism: Mechanism, headline, reasoning: str) -> dict:
     }, ensure_ascii=False)
 
     response = client.messages.create(
-        model="claude-sonnet-4-6",
-        max_tokens=600,
+        model=MODEL,
+        max_tokens=1200,
+        output_config={"effort": "medium"},  # habillage narratif court, pas besoin de "high"
         system=DRESS_SYSTEM_PROMPT,
         messages=[{"role": "user", "content": user_prompt}],
     )
 
-    dressed = json.loads(response.content[0].text.strip())
+    raw = next(b.text for b in response.content if b.type == "text").strip()
+    if raw.startswith("```"):
+        raw = raw.strip("`").removeprefix("json").strip()
+    dressed = json.loads(raw)
 
     # Garde-fou : on écrase toujours explanation/source avec les valeurs
     # figées du pool, même si le LLM a tenté de les reformuler

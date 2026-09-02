@@ -22,6 +22,13 @@ from mechanisms_pool import get_mechanism, FULL_POOL
 SHARED_EDITIONS_FILE = "editions_partagees.json"     # une par jour, pour tous
 USER_PROGRESS_FILE = "progression_utilisateurs.json"  # une entrée par joueur
 
+# Fichier public, lu directement par test-comprehension-mondev.html — ne
+# contient jamais de données de progression individuelle, seulement les
+# éditions fraîches les plus récentes (format "démo enchaînée").
+PUBLIC_EDITION_FILE = "edition_comprehension_monde.json"
+MAX_PUBLIC_QUESTIONS = 6
+ANALYST_PRESENTERS = ["Véronica", "Dan"]  # alterne, John reste toujours le rapporteur
+
 
 def load_user_progress(user_id: str) -> dict:
     try:
@@ -73,25 +80,73 @@ def build_shared_edition_of_the_day() -> dict:
     if today in editions:
         return editions[today]  # déjà générée aujourd'hui, on ne repaie pas l'IA deux fois
 
-    headlines = fetch_todays_headlines()
-    if not headlines:
-        edition = {"type": "aucune", "reason": "Aucune actualité fraîche collectée"}
-    else:
-        match = match_headlines_to_mechanism(headlines, FULL_POOL)
-        if not match["matched"]:
-            edition = {"type": "aucune", "reason": match["reason"]}
+    try:
+        headlines = fetch_todays_headlines()
+        if not headlines:
+            edition = {"type": "aucune", "reason": "Aucune actualité fraîche collectée"}
         else:
-            mechanism = get_mechanism(match["mechanism_id"])
-            dressed = dress_edition(mechanism, match["headline"], match["reasoning"])
-            edition = {
-                "date": today, "type": "fraîche", "mechanism_id": mechanism.id,
-                "confidence": match["confidence"], "edition": dressed,
-            }
+            match = match_headlines_to_mechanism(headlines, FULL_POOL)
+            if not match["matched"]:
+                edition = {"type": "aucune", "reason": match["reason"]}
+            else:
+                mechanism = get_mechanism(match["mechanism_id"])
+                dressed = dress_edition(mechanism, match["headline"], match["reasoning"])
+                edition = {
+                    "date": today, "type": "fraîche", "mechanism_id": mechanism.id,
+                    "confidence": match["confidence"], "edition": dressed,
+                }
+    except Exception as e:
+        # Flux RSS en panne, quota API dépassé, JSON malformé... un jour
+        # creux ne doit jamais faire planter la tâche planifiée ni écraser
+        # l'historique déjà construit.
+        edition = {"type": "aucune", "reason": f"Erreur pipeline : {e}"}
 
     editions[today] = edition
     with open(SHARED_EDITIONS_FILE, "w") as f:
         json.dump(editions, f, ensure_ascii=False, indent=2, default=str)
+
+    export_public_edition(editions)
     return edition
+
+
+def export_public_edition(editions: dict, max_questions: int = MAX_PUBLIC_QUESTIONS):
+    """Reconstruit le fichier public consommé par test-comprehension-mondev.html
+    à partir des dernières éditions 'fraîches' (les jours 'aucune'/'révision'
+    n'ont pas de contenu dressé à montrer et sont ignorés ici)."""
+    fresh_days = sorted(
+        (day for day, ed in editions.items() if ed.get("type") == "fraîche"),
+        reverse=True,
+    )[:max_questions]
+
+    questions = []
+    for i, day in enumerate(reversed(fresh_days)):  # ordre chronologique pour la démo
+        ed = editions[day]
+        mechanism = get_mechanism(ed["mechanism_id"])
+        dressed = ed["edition"]
+        neighbor_labels = [
+            {"id": nid, "label": n.label}
+            for nid in mechanism.connects_to
+            if (n := get_mechanism(nid)) is not None
+        ]
+        questions.append({
+            "date": day,
+            "mechanism_id": mechanism.id,
+            "category": mechanism.category.value,
+            "type": mechanism.mechanism_type.value,
+            "presenter_ask": "John",
+            "presenter_answer": ANALYST_PRESENTERS[i % len(ANALYST_PRESENTERS)],
+            "situation": dressed.get("situation") or dressed.get("intro", ""),
+            "options": dressed["options"],
+            "explanation": mechanism.explanation,
+            "source": mechanism.source,
+            "mechanism_label": mechanism.label,
+            "connects_to": neighbor_labels,
+        })
+
+    public = {"generated_at": datetime.now().isoformat(), "questions": questions}
+    with open(PUBLIC_EDITION_FILE, "w") as f:
+        json.dump(public, f, ensure_ascii=False, indent=2)
+    return public
 
 
 def get_edition_for_user(user_id: str) -> dict:

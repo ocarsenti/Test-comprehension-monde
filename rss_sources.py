@@ -3,9 +3,10 @@ Collecte des actualités du jour — aucune IA ici, juste des flux RSS
 publics et gratuits. C'est volontaire : pas besoin de payer une
 recherche web pour une liste de sources déjà connue à l'avance.
 
-Les URLs ci-dessous sont indicatives — À VÉRIFIER une par une avant mise
-en prod (certains flux changent d'adresse sans préavis). Ne pas faire
-confiance à cette liste telle quelle sans un test réel de chaque flux.
+TRUSTED_SOURCES a été testé un par un (statut HTTP 200 + entrées non
+vides) le 2026-09-02. Un flux peut changer d'adresse sans préavis —
+si fetch_todays_headlines() ne renvoie plus rien pour une source, la
+retester avant de la remettre en confiance aveugle.
 """
 
 import feedparser  # pip install feedparser
@@ -22,14 +23,14 @@ class Headline:
     published: datetime
 
 
-# Sources à vérifier individuellement — placeholders pour la structure,
-# pas une liste validée
+# Testés individuellement le 2026-09-02 (statut 200, entrées présentes)
 TRUSTED_SOURCES = {
-    "AFP": "https://www.afp.com/fr/rss.xml",  # à vérifier
-    "Reuters France": "https://www.reuters.com/world/france/rss",  # à vérifier
-    "Le Monde - International": "https://www.lemonde.fr/international/rss_full.xml",  # à vérifier
-    "Les Echos - Economie": "https://www.lesechos.fr/rss/rss_economie.xml",  # à vérifier
-    "France Info": "https://www.francetvinfo.fr/titres.rss",  # à vérifier
+    "Le Monde - International": "https://www.lemonde.fr/international/rss_full.xml",
+    "Le Monde - Economie": "https://www.lemonde.fr/economie/rss_full.xml",
+    "Le Monde - Planète": "https://www.lemonde.fr/planete/rss_full.xml",
+    "Le Monde - Pixels": "https://www.lemonde.fr/pixels/rss_full.xml",
+    "RFI - Monde": "https://www.rfi.fr/fr/monde/rss",
+    "Courrier International": "https://www.courrierinternational.com/feed/all/rss.xml",
 }
 
 
