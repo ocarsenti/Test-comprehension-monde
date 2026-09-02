@@ -32,6 +32,7 @@ NEW = """      location = /test-comprehension-mondev.html {
 
       location = /edition_comprehension_monde.json {
         alias /home/olive/comprehension_monde/edition_comprehension_monde.json;
+        default_type application/json;
         auth_basic off;
         add_header Cache-Control "no-store";
     }
