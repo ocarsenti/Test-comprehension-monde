@@ -613,6 +613,15 @@ function recordConsultation(q) {
   saveJSONLS(LS_KEYS.history, history);
 }
 
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
 function escapeHtml(s) {
   const d = document.createElement('div');
   d.textContent = s || '';
@@ -692,7 +701,7 @@ function buildTrack() {
     const ansAvatar = AVATAR[q.presenter_answer] || AVATAR['Dan'];
     const tag = q.type === 'DILEMMA' ? `${q.category} — dilemme, pas de vérité fixe` : q.category;
 
-    const optionsHtml = q.options.map((opt) =>
+    const optionsHtml = shuffle(q.options).map((opt) =>
       `<button class="opt" data-correct="${opt.correct}" onclick="answer(${i}, ${opt.correct}, this)">${escapeHtml(opt.text)}</button>`
     ).join('');
 
