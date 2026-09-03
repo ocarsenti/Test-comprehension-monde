@@ -8,6 +8,8 @@ export function ZoneDetailPanel({
   mechanism: MechanismEntry;
   onClose: () => void;
 }) {
+  const [ceCause, ceEffect] = (mechanism.cause_effect || "").split("→");
+
   return (
     <div style={styles.overlay} onClick={onClose}>
       <div style={styles.panel} onClick={e => e.stopPropagation()}>
@@ -22,6 +24,17 @@ export function ZoneDetailPanel({
             ×
           </button>
         </div>
+
+        {ceEffect && (
+          <div style={styles.mechCard}>
+            <span style={styles.mechCardLabel}>Mécanisme</span>
+            <p style={styles.mechCardText}>
+              {ceCause}
+              <span style={styles.mechArrow}>→</span>
+              {ceEffect}
+            </p>
+          </div>
+        )}
 
         {mechanism.state === "encountered" && (
           <p style={styles.hint}>
@@ -82,6 +95,24 @@ const styles: Record<string, React.CSSProperties> = {
     marginBottom: 8,
   },
   title: { margin: 0, fontSize: 18, fontWeight: 800, color: "#1c2b3a" },
+  mechCard: {
+    background: "#fdf3e4",
+    border: "2px solid #b6792a",
+    borderRadius: 14,
+    padding: "12px 16px",
+    margin: "12px 0 4px",
+  },
+  mechCardLabel: {
+    display: "block",
+    fontSize: 10,
+    fontWeight: 700,
+    color: "#8a5a1c",
+    textTransform: "uppercase",
+    letterSpacing: "0.04em",
+    marginBottom: 5,
+  },
+  mechCardText: { margin: 0, fontSize: 13, fontWeight: 700, color: "#1c2b3a" },
+  mechArrow: { color: "#8a5a1c", fontWeight: 900, margin: "0 6px" },
   close: { background: "none", border: "none", color: "#64748b", fontSize: 24, cursor: "pointer" },
   hint: { color: "#64748b", fontSize: 13, margin: "10px 0 16px" },
   mastered: { color: "#0e7a45", fontSize: 13, fontWeight: 700, margin: "10px 0 16px" },

@@ -1,8 +1,31 @@
-import { geoPath, type GeoProjection } from "d3-geo";
+import { geoGraticule, geoPath, type GeoProjection } from "d3-geo";
 import * as THREE from "three";
 import type { GeoCountry, ZoneMapping, MechanismEntry } from "./types";
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from "./geo";
-import { ZONE_RENDER, masteredFill, masteredStroke } from "./colors";
+import { ZONE_RENDER, masteredFill, masteredStroke, GRATICULE_COLOR, EQUATOR_COLOR } from "./colors";
+
+const EQUATOR: GeoJSON.LineString = {
+  type: "LineString",
+  coordinates: Array.from({ length: 73 }, (_, i) => [i * 5 - 180, 0]),
+};
+
+function drawGraticule(ctx: CanvasRenderingContext2D, projection: GeoProjection) {
+  const path = geoPath(projection, ctx);
+  const graticule = geoGraticule().step([20, 20])();
+
+  ctx.beginPath();
+  path(graticule);
+  ctx.lineWidth = 1;
+  ctx.strokeStyle = GRATICULE_COLOR;
+  ctx.stroke();
+
+  // équateur en plus gras, pour repérer tout de suite qu'il s'agit de la Terre.
+  ctx.beginPath();
+  path(EQUATOR);
+  ctx.lineWidth = 2.5;
+  ctx.strokeStyle = EQUATOR_COLOR;
+  ctx.stroke();
+}
 
 export function buildCountryToZone(mapping: ZoneMapping[]): Map<string, ZoneMapping> {
   const m = new Map<string, ZoneMapping>();
@@ -26,10 +49,19 @@ export function drawMap(
   ctx.fillStyle = ZONE_RENDER.oceanBackground;
   ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
+  // Quadrillage lat/long dessiné sur le fond AVANT les pays : une zone non
+  // découverte ne reçoit ensuite aucun tracé par-dessus (voir plus bas), donc
+  // le quadrillage continue de la traverser sans interruption — impossible
+  // d'en deviner le contour, tout en identifiant tout de suite le globe
+  // comme la Terre dès le premier chargement (0 mécanisme rencontré).
+  drawGraticule(ctx, projection);
+
   for (const country of countries) {
     const zone = countryToZone.get(country.id);
     const mech = zone ? mechanismsById.get(zone.zoneId) : undefined;
     const state = mech?.state ?? "undiscovered";
+
+    if (state === "undiscovered") continue; // rien à dessiner : se fond dans le fond + grille.
 
     ctx.beginPath();
     path(country.feature);
@@ -40,16 +72,12 @@ export function drawMap(
       ctx.lineWidth = 1;
       ctx.strokeStyle = masteredStroke(mech.category);
       ctx.stroke();
-    } else if (state === "encountered") {
+    } else {
       ctx.fillStyle = ZONE_RENDER.encountered.fill;
       ctx.fill();
       ctx.lineWidth = 0.6;
       ctx.strokeStyle = ZONE_RENDER.encountered.stroke!;
       ctx.stroke();
-    } else {
-      ctx.fillStyle = ZONE_RENDER.undiscovered.fill;
-      ctx.fill();
-      // pas de contour pour les zones non découvertes — se fond dans le fond.
     }
   }
 }

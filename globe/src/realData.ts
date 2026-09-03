@@ -57,6 +57,7 @@ export async function loadRealMechanismPool(): Promise<MechanismEntry[]> {
       category: m.category,
       label: m.label,
       state: stateFromEncounterCount(encounters.length),
+      cause_effect: m.cause_effect,
       encounters,
     };
   });

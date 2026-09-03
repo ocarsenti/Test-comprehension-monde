@@ -905,7 +905,14 @@ function openMechDetail(id) {
   if (!m) return;
   document.getElementById('mechDetailTitle').textContent = m.label;
   document.getElementById('mechDetailTag').textContent = m.category;
-  document.getElementById('mechDetailBody').innerHTML = m.encounters.slice().reverse().map(e => `
+  const [ceCause, ceEffect] = (m.cause_effect || '').split('→');
+  const causeEffectHtml = ceEffect
+    ? `<div class="mech-card show" style="margin-bottom:14px;">
+         <span class="mech-card-label">Mécanisme</span>
+         <p>${escapeHtml(ceCause)}<span class="mech-arrow">→</span>${escapeHtml(ceEffect)}</p>
+       </div>`
+    : '';
+  document.getElementById('mechDetailBody').innerHTML = causeEffectHtml + m.encounters.slice().reverse().map(e => `
     <div class="encounter-card">
       <span class="encounter-date">${escapeHtml(e.date)}</span>
       <p class="encounter-situation">${escapeHtml(e.situation)}</p>

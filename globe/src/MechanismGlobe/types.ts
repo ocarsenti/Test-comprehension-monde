@@ -12,6 +12,7 @@ export interface MechanismEntry {
   category: string;
   label: string;
   state: ZoneState;
+  cause_effect?: string; // résumé causal "Cause→Effet", toujours affiché avec le mécanisme
   encounters?: Encounter[];
 }
 
