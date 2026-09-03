@@ -420,6 +420,8 @@
   .encounter-situation { font-size: 13px; font-weight: 700; margin: 0 0 6px; color: var(--text); }
   .encounter-explain { font-size: 13px; margin: 0 0 6px; color: var(--text-dim); }
   .encounter-source { font-size: 11px; margin: 0; color: var(--text-dim); font-style: italic; }
+  .encounter-source a, .source-article a { color: var(--accent-dark); text-decoration: underline; }
+  .source-article { font-size: 11px; margin: 6px 0 0; color: var(--text-dim); font-style: italic; }
 
   .mind-legend {
     display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; font-size: 12px; color: var(--text-dim);
@@ -605,7 +607,11 @@ function recordConsultation(q) {
   };
   const already = entry.encounters.some(e => e.date === q.date);
   if (!already) {
-    entry.encounters.push({ date: q.date, situation: q.situation, explanation: q.explanation, source: q.source });
+    entry.encounters.push({
+      date: q.date, situation: q.situation, explanation: q.explanation, source: q.source,
+      source_article_title: q.source_article_title, source_article_url: q.source_article_url,
+      source_article_outlet: q.source_article_outlet,
+    });
   }
   history[q.mechanism_id] = entry;
   saveJSONLS(LS_KEYS.history, history);
@@ -624,6 +630,19 @@ function escapeHtml(s) {
   const d = document.createElement('div');
   d.textContent = s || '';
   return d.innerHTML;
+}
+
+// Lien cliquable vers l'actu réelle qui a inspiré l'édition, quand on l'a
+// (éditions générées avant l'ajout de ce champ n'en ont pas). N'accepte que
+// des URL http(s) — l'origine (flux RSS externe) n'est pas de confiance
+// aveugle pour un schéma d'URL arbitraire (javascript:, data:...).
+function sourceArticleHtml(q) {
+  const url = q.source_article_url;
+  if (!url || !/^https?:\/\//i.test(url)) return '';
+  const label = q.source_article_title || q.source_article_outlet || 'lien';
+  const outlet = q.source_article_outlet && q.source_article_title
+    ? ` (${escapeHtml(q.source_article_outlet)})` : '';
+  return `Actu qui a inspiré cette édition : <a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(label)}</a>${outlet}`;
 }
 
 function johnAvatar() {
@@ -726,6 +745,7 @@ function buildTrack() {
         <div class="presenter-bubble">
           <p class="presenter-name">${escapeHtml(q.presenter_answer)}</p>
           <p class="explain" id="rtext${i}"></p>
+          <p class="source-article" id="srcarticle${i}"></p>
         </div>
       </div>
       <div class="mech-card" id="mechCard${i}">
@@ -758,7 +778,8 @@ function answer(n, correct, btn) {
   const r = document.getElementById('r' + n);
   r.classList.add('show', correct ? 'correct' : 'incorrect');
   document.getElementById('rtext' + n).textContent =
-    (correct ? "Juste. " : "Pas tout à fait. ") + q.explanation + " Source : " + q.source;
+    (correct ? "Juste. " : "Pas tout à fait. ") + q.explanation + " Source du mécanisme : " + q.source;
+  document.getElementById('srcarticle' + n).innerHTML = sourceArticleHtml(q);
   document.getElementById('mechCard' + n).classList.add('show');
   document.getElementById('n' + n).classList.add('show');
 }
@@ -919,14 +940,18 @@ function openMechDetail(id) {
          <p>${escapeHtml(ceCause)}<span class="mech-arrow">→</span>${escapeHtml(ceEffect)}</p>
        </div>`
     : '';
-  document.getElementById('mechDetailBody').innerHTML = causeEffectHtml + m.encounters.slice().reverse().map(e => `
+  document.getElementById('mechDetailBody').innerHTML = causeEffectHtml + m.encounters.slice().reverse().map(e => {
+    const articleLink = sourceArticleHtml(e);
+    return `
     <div class="encounter-card">
       <span class="encounter-date">${escapeHtml(e.date)}</span>
       <p class="encounter-situation">${escapeHtml(e.situation)}</p>
       <p class="encounter-explain">${escapeHtml(e.explanation)}</p>
-      <p class="encounter-source">Source : ${escapeHtml(e.source)}</p>
+      <p class="encounter-source">Source du mécanisme : ${escapeHtml(e.source)}</p>
+      ${articleLink ? `<p class="source-article">${articleLink}</p>` : ''}
     </div>
-  `).join('');
+  `;
+  }).join('');
   document.getElementById('mechDetailModal').classList.add('show');
 }
 

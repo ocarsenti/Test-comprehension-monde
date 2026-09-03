@@ -21,7 +21,8 @@ client = Anthropic()  # lit ANTHROPIC_API_KEY dans l'environnement
 
 MODEL = "claude-opus-5"
 
-CONFIDENCE_THRESHOLD = 0.7  # en dessous, la scène part en revue humaine
+CONFIDENCE_THRESHOLD = 0.7  # au-dessus, publication automatique
+REVIEW_THRESHOLD = 0.5      # entre les deux, part en revue humaine plutôt que d'être jetée
 
 MATCH_SYSTEM_PROMPT = """Tu rapproches une liste de titres d'actualité d'un pool fixe de mécanismes causaux.
 
@@ -74,15 +75,26 @@ def match_headlines_to_mechanism(headlines: list, pool: list[Mechanism] = FULL_P
     if result.get("mechanism_id"):
         valid_ids = {m.id for m in pool}
         if result["mechanism_id"] not in valid_ids:
-            return {"matched": False, "reason": "mechanism_id hors pool — halluciné, rejeté"}
+            return {"matched": False, "status": "rejected",
+                    "reason": "mechanism_id hors pool — halluciné, rejeté"}
 
-    if not result.get("mechanism_id") or result.get("confidence", 0) < CONFIDENCE_THRESHOLD:
-        return {"matched": False, "reason": "aucun candidat au-dessus du seuil de confiance", "raw": result}
+    confidence = result.get("confidence", 0)
+    if not result.get("mechanism_id") or confidence < REVIEW_THRESHOLD:
+        return {"matched": False, "status": "none",
+                "reason": "aucun candidat au-dessus du seuil de revue", "raw": result}
 
-    return {
-        "matched": True,
+    base = {
         "headline": headlines[result["headline_index"]],
         "mechanism_id": result["mechanism_id"],
-        "confidence": result["confidence"],
+        "confidence": confidence,
         "reasoning": result["reasoning"],
     }
+
+    if confidence < CONFIDENCE_THRESHOLD:
+        # Ni assez sûr pour publier seul, ni assez faible pour être jeté :
+        # `matched` reste False (compatibilité des scripts existants qui ne
+        # gèrent que le cas publiable), mais `status` porte l'info fine.
+        return {"matched": False, "status": "review",
+                "reason": "sous le seuil de publication automatique, part en revue humaine", **base}
+
+    return {"matched": True, "status": "auto", **base}

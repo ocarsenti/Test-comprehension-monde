@@ -1,13 +1,24 @@
 """
-Construction de l'édition du jour — orchestre les trois briques
-(rss_sources, matcher, dresser) sans jamais leur faire dépasser leur
-rôle : collecte gratuite, jugement de rattachement, habillage narratif.
+Construction de l'édition du jour — orchestre les quatre briques
+(rss_sources, matcher, dresser, auditor) sans jamais leur faire dépasser
+leur rôle : collecte gratuite, jugement de rattachement, habillage
+narratif, relecture indépendante.
 
 MULTI-UTILISATEUR : l'édition du jour est calculée UNE FOIS, partagée
 par tout le monde (c'est elle qui reste bon marché). La progression
 (qui a rencontré quoi, quand) est strictement individuelle — deux
 tables séparées, jamais mélangées. Un joueur qui rejoint en cours de
 route ne dépend jamais de l'historique des autres.
+
+PROCESSUS ÉDITORIAL À PLUSIEURS ÉTAPES (pas une seule passe) :
+rédaction (dresser.py) → relecture indépendante (auditor.py) → publication
+automatique UNIQUEMENT si le rattachement est sûr (confiance >= 0.7) ET que
+la relecture n'a rien signalé. Dans tous les autres cas où un candidat
+existe (rattachement limite entre 0.5 et 0.7, ou relecture qui signale un
+problème de rigueur), l'édition est entièrement rédigée mais part en type
+"en_attente_validation" — jamais montrée aux joueurs (export_public_edition
+ne prend que "fraîche") tant qu'un humain ne l'a pas approuvée via
+revoir_editions.py.
 """
 
 import json
@@ -16,6 +27,7 @@ from datetime import datetime, date
 from rss_sources import fetch_todays_headlines
 from matcher import match_headlines_to_mechanism
 from dresser import dress_edition
+from auditor import audit_edition
 from mechanisms_pool import get_mechanism, FULL_POOL
 
 # En prod : remplacer ces deux fichiers par de vraies tables (Postgres...)
@@ -86,24 +98,41 @@ def build_shared_edition_of_the_day() -> dict:
             edition = {"type": "aucune", "reason": "Aucune actualité fraîche collectée"}
         else:
             match = match_headlines_to_mechanism(headlines, FULL_POOL)
-            if not match["matched"]:
+            if match["status"] == "none" or match["status"] == "rejected":
                 edition = {"type": "aucune", "reason": match["reason"]}
             else:
+                # status "auto" (confiance >= 0.7) ou "review" (0.5-0.7) :
+                # dans les deux cas on rédige et on relit — la décision de
+                # publier automatiquement ou de mettre en attente se prend
+                # APRÈS avoir vu le verdict de la relecture, jamais avant.
                 mechanism = get_mechanism(match["mechanism_id"])
-                dressed = dress_edition(mechanism, match["headline"], match["reasoning"])
                 headline = match["headline"]
-                edition = {
-                    "date": today, "type": "fraîche", "mechanism_id": mechanism.id,
-                    "confidence": match["confidence"], "edition": dressed,
-                    # Traçabilité : permet de vérifier après coup que `situation`
-                    # (dressed par le LLM) est resté fidèle à l'actualité réelle
-                    # fournie, sans devoir refaire confiance à la mémoire du LLM.
-                    "source_headline": {
-                        "title": headline.title, "summary": headline.summary,
-                        "source": headline.source, "link": headline.link,
-                        "published": headline.published.isoformat(),
-                    },
+                dressed = dress_edition(mechanism, headline, match["reasoning"])
+                audit = audit_edition(mechanism, dressed, headline)
+
+                # Traçabilité : permet de vérifier après coup que `situation`
+                # (dressed par le LLM) est resté fidèle à l'actualité réelle
+                # fournie, sans devoir refaire confiance à la mémoire du LLM.
+                source_headline = {
+                    "title": headline.title, "summary": headline.summary,
+                    "source": headline.source, "link": headline.link,
+                    "published": headline.published.isoformat(),
                 }
+
+                publishable = match["status"] == "auto" and audit.get("passed")
+                edition = {
+                    "date": today,
+                    "type": "fraîche" if publishable else "en_attente_validation",
+                    "mechanism_id": mechanism.id,
+                    "confidence": match["confidence"], "edition": dressed,
+                    "source_headline": source_headline, "audit": audit,
+                }
+                if not publishable:
+                    edition["reason"] = (
+                        "relecture automatique a signalé un problème de rigueur"
+                        if match["status"] == "auto" else
+                        "confiance de rattachement sous le seuil de publication automatique"
+                    )
     except Exception as e:
         # Flux RSS en panne, quota API dépassé, JSON malformé... un jour
         # creux ne doit jamais faire planter la tâche planifiée ni écraser
@@ -116,6 +145,57 @@ def build_shared_edition_of_the_day() -> dict:
 
     export_public_edition(editions)
     return edition
+
+
+def list_pending_reviews() -> list[dict]:
+    """Éditions rédigées et relues mais pas encore validées par un humain,
+    les plus récentes en premier. Rien n'est publié tant que
+    approve_pending_edition() n'a pas été appelé sur une date donnée."""
+    try:
+        with open(SHARED_EDITIONS_FILE) as f:
+            editions = json.load(f)
+    except FileNotFoundError:
+        return []
+    return [
+        {"date": day, **ed}
+        for day, ed in sorted(editions.items(), reverse=True)
+        if ed.get("type") == "en_attente_validation"
+    ]
+
+
+def approve_pending_edition(day: str) -> dict:
+    """Publie manuellement une édition en attente : bascule son type en
+    'fraîche' puis régénère le fichier public. Ne rappelle jamais le LLM —
+    le texte déjà rédigé et relu est publié tel quel, décision humaine
+    finale, pas une nouvelle génération."""
+    with open(SHARED_EDITIONS_FILE) as f:
+        editions = json.load(f)
+    if editions.get(day, {}).get("type") != "en_attente_validation":
+        raise ValueError(f"Pas d'édition en attente de validation pour {day}")
+
+    editions[day]["type"] = "fraîche"
+    editions[day]["approved_manually"] = True
+    with open(SHARED_EDITIONS_FILE, "w") as f:
+        json.dump(editions, f, ensure_ascii=False, indent=2, default=str)
+
+    export_public_edition(editions)
+    return editions[day]
+
+
+def reject_pending_edition(day: str, reason: str = "") -> dict:
+    """Rejette une édition en attente — elle reste dans l'historique pour
+    traçabilité (on voit ce qui a été écarté et pourquoi) mais ne sera
+    jamais publiée."""
+    with open(SHARED_EDITIONS_FILE) as f:
+        editions = json.load(f)
+    if editions.get(day, {}).get("type") != "en_attente_validation":
+        raise ValueError(f"Pas d'édition en attente de validation pour {day}")
+
+    editions[day]["type"] = "rejetée"
+    editions[day]["rejection_reason"] = reason
+    with open(SHARED_EDITIONS_FILE, "w") as f:
+        json.dump(editions, f, ensure_ascii=False, indent=2, default=str)
+    return editions[day]
 
 
 def export_public_edition(editions: dict, max_questions: int = MAX_PUBLIC_QUESTIONS):
@@ -137,6 +217,10 @@ def export_public_edition(editions: dict, max_questions: int = MAX_PUBLIC_QUESTI
             for nid in mechanism.connects_to
             if (n := get_mechanism(nid)) is not None
         ]
+        # Traçabilité côté joueur : le lien réel vers l'article qui a
+        # inspiré l'édition, quand on l'a (éditions générées avant l'ajout
+        # de ce champ n'en ont pas — on ne les invente jamais après coup).
+        src = ed.get("source_headline") or {}
         questions.append({
             "date": day,
             "mechanism_id": mechanism.id,
@@ -148,6 +232,9 @@ def export_public_edition(editions: dict, max_questions: int = MAX_PUBLIC_QUESTI
             "options": dressed["options"],
             "explanation": mechanism.explanation,
             "source": mechanism.source,
+            "source_article_title": src.get("title") or None,
+            "source_article_url": src.get("link") or None,
+            "source_article_outlet": src.get("source") or None,
             "mechanism_label": mechanism.label,
             "cause_effect": mechanism.cause_effect,
             "connects_to": neighbor_labels,

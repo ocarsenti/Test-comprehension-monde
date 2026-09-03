@@ -55,12 +55,37 @@ def notify_new_edition(edition: dict):
         print(f"notification ntfy échouée : {e}")
 
 
+def notify_pending_review(edition: dict):
+    """Édition rédigée et relue, mais qui attend une décision humaine
+    (rattachement limite ou relecture ayant signalé un problème) — jamais
+    publiée automatiquement, jamais montrée aux joueurs tant que personne
+    n'a tranché via revoir_editions.py."""
+    if not NTFY_TOPIC:
+        return
+    mechanism = get_mechanism(edition["mechanism_id"])
+    message = f"{mechanism.label} — {edition.get('reason', 'à valider')}\n\nSSH puis : python3 revoir_editions.py"
+    try:
+        requests.post(
+            f"https://ntfy.sh/{NTFY_TOPIC}",
+            data=message.encode("utf-8"),
+            headers={
+                "Title": "Édition à valider — Le monde en mécanismes",
+                "Tags": "warning",
+            },
+            timeout=10,
+        )
+    except Exception as e:
+        print(f"notification ntfy échouée : {e}")
+
+
 if __name__ == "__main__":
     is_new_run = not today_already_recorded()
     edition = build_shared_edition_of_the_day()
 
     if is_new_run and edition.get("type") == "fraîche":
         notify_new_edition(edition)
+    elif is_new_run and edition.get("type") == "en_attente_validation":
+        notify_pending_review(edition)
 
     stamp = datetime.now().isoformat(timespec="seconds")
     print(f"[{stamp}] type={edition.get('type')} "
