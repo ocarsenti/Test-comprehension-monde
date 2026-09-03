@@ -49,10 +49,15 @@ function shade(hex: string, factor: number): string {
   );
 }
 
+// Thème clair (fond blanc, cohérent avec le reste de la démo) : l'océan et
+// les zones non découvertes partagent EXACTEMENT la même teinte, pour que
+// les pays non découverts restent invisibles (aucun contour) — seule la
+// couleur change par rapport à un thème sombre, jamais la règle "invisible
+// tant que non découvert".
 export const ZONE_RENDER = {
-  undiscovered: { fill: "#000000", stroke: null as string | null },
+  undiscovered: { fill: "#f4f6fa", stroke: null as string | null },
   encountered: { fill: "#5b6472", stroke: "#8b95a5" },
-  oceanBackground: "#04060b",
+  oceanBackground: "#f4f6fa",
 };
 
 export function masteredFill(category: string): string {

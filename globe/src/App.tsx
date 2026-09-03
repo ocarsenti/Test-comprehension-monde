@@ -46,15 +46,15 @@ function EmbedApp() {
 
   if (error) {
     return (
-      <div style={{ width: "100%", height: "100vh", background: "#0a0c12", color: "#e7e9ee", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "system-ui, sans-serif", fontSize: 13, padding: 20, textAlign: "center" }}>
+      <div style={{ width: "100%", height: "100vh", background: "#ffffff", color: "#1c2b3a", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "system-ui, sans-serif", fontSize: 13, padding: 20, textAlign: "center" }}>
         Pool de mécanismes indisponible ({error}).
       </div>
     );
   }
-  if (!pool) return <div style={{ width: "100%", height: "100vh", background: "#0a0c12" }} />;
+  if (!pool) return <div style={{ width: "100%", height: "100vh", background: "#ffffff" }} />;
 
   return (
-    <div style={{ width: "100%", height: "100vh", background: "#0a0c12" }}>
+    <div style={{ width: "100%", height: "100vh", background: "#ffffff" }}>
       <MechanismGlobe mechanismPool={pool} />
     </div>
   );
