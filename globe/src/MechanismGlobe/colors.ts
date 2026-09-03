@@ -60,11 +60,10 @@ export const ZONE_RENDER = {
   oceanBackground: "#f4f6fa",
 };
 
-// Quadrillage lat/long : du blanc pur serait invisible sur le fond clair
-// #f4f6fa (contraste quasi nul) — on prend donc un gris-bleu qui se voit
-// vraiment, l'équateur plus soutenu pour la hiérarchie visuelle demandée.
-export const GRATICULE_COLOR = "#c7d0dc";
-export const EQUATOR_COLOR = "#9aa7b8";
+// Quadrillage lat/long en blanc, comme demandé — l'équateur se distingue
+// par son épaisseur (2.5px vs 1px), pas par sa couleur.
+export const GRATICULE_COLOR = "#ffffff";
+export const EQUATOR_COLOR = "#ffffff";
 
 export function masteredFill(category: string): string {
   return categoryColor(category);
