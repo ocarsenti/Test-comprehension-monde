@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Le monde en mécanismes — Admin éditions</title>
+<style>
+:root {
+  --bg: #f5f6f8; --panel: #ffffff; --surface: #f1f2f5; --border: #e1e4ea;
+  --text: #16181d; --muted: #6b7280; --accent: #3458e8;
+  --ok: #1d9a5b; --warn: #c2780a; --bad: #dc3545;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); line-height: 1.5; }
+.container { max-width: 860px; margin: 0 auto; padding: 28px 24px 60px; }
+h1 { font-size: 1.4rem; margin-bottom: 4px; }
+.subtitle { color: var(--muted); font-size: 0.9rem; margin-bottom: 16px; }
+
+.grid-notice {
+  background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
+  padding: 16px 18px; margin-bottom: 24px; font-size: 0.85rem;
+}
+.grid-notice summary { cursor: pointer; font-weight: 600; }
+.grid-notice ol { margin: 10px 0 0 20px; color: var(--muted); }
+.grid-notice li { margin-bottom: 6px; }
+
+.toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+button { padding: 9px 18px; border: 1px solid var(--accent); background: transparent; color: var(--accent); border-radius: 8px; font-size: 0.85rem; cursor: pointer; }
+button:hover { background: rgba(52,88,232,0.08); }
+button:disabled { opacity: 0.5; cursor: default; }
+.btn-approve { border-color: var(--ok); color: var(--ok); }
+.btn-approve:hover { background: rgba(29,154,91,0.08); }
+.btn-reject { border-color: var(--bad); color: var(--bad); }
+.btn-reject:hover { background: rgba(220,53,69,0.08); }
+
+.loading, .empty, .error { color: var(--muted); font-size: 0.9rem; padding: 20px 0; text-align: center; }
+.error { color: var(--bad); }
+
+.card {
+  background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
+  padding: 18px 20px; margin-bottom: 20px;
+}
+.card-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+.card-title { font-weight: 700; font-size: 1.02rem; }
+.card-meta { color: var(--muted); font-size: 0.8rem; margin-top: 2px; }
+.badge { display: inline-block; padding: 2px 9px; border-radius: 6px; font-size: 0.74rem; font-weight: 700; white-space: nowrap; }
+.badge-review { background: #fdf0e0; color: var(--warn); }
+.badge-audit-fail { background: #fbe6e8; color: var(--bad); }
+.badge-category { background: var(--surface); color: var(--muted); }
+
+.reason { font-size: 0.85rem; color: var(--warn); margin-bottom: 10px; }
+
+.issues { background: #fbe6e8; border: 1px solid var(--bad); border-radius: 8px; padding: 10px 12px; margin-bottom: 12px; font-size: 0.82rem; }
+.issues-title { font-weight: 700; color: var(--bad); margin-bottom: 4px; }
+.issues ul { margin: 4px 0 0 18px; color: var(--text); }
+
+.section-label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; color: var(--muted); margin: 12px 0 4px; }
+.mechanism-box { background: var(--surface); border-radius: 8px; padding: 10px 12px; font-size: 0.85rem; }
+.mechanism-box .cause-effect { font-family: monospace; font-size: 0.82rem; margin-bottom: 6px; color: var(--accent); }
+
+.intro-text, .situation-text { font-size: 0.88rem; }
+.options { list-style: none; margin-top: 6px; }
+.options li { padding: 7px 10px; border: 1px solid var(--border); border-radius: 6px; margin-bottom: 6px; font-size: 0.85rem; }
+.options li.correct { border-color: var(--ok); background: rgba(29,154,91,0.06); }
+.options li .mark { font-weight: 700; margin-right: 6px; }
+.options li.correct .mark { color: var(--ok); }
+
+.source-box { font-size: 0.82rem; color: var(--muted); margin-top: 4px; }
+.source-box a { color: var(--accent); }
+
+.actions { display: flex; gap: 10px; margin-top: 16px; align-items: center; flex-wrap: wrap; }
+.reject-reason { flex: 1 1 220px; padding: 7px 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 0.82rem; }
+.action-feedback { font-size: 0.8rem; margin-left: 6px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Éditions en attente de validation</h1>
+  <p class="subtitle">Rattachement actu → mécanisme incertain, ou relecture automatique ayant signalé un problème. Rien ici n'est visible des joueurs tant que ce n'est pas approuvé.</p>
+
+  <details class="grid-notice">
+    <summary>Grille de rigueur à vérifier avant d'approuver</summary>
+    <ol>
+      <li><strong>Un seul mécanisme causal.</strong> Le texte ne doit pas faire croire que le mécanisme est LA seule explication de l'actualité s'il existe d'autres causes indépendantes possibles.</li>
+      <li><strong>Pas de sur-simplification.</strong> Aucune affirmation d'une certitude mécanique et systématique ("automatiquement", "toujours"...) là où la réalité est une tendance ou un facteur parmi d'autres.</li>
+      <li><strong>Fait sourcé vs exemple illustratif.</strong> Aucun fait, chiffre ou citation attribué à une personne réelle qui ne figure pas dans l'actu source fournie ci-dessous. Tout scénario ajouté doit être marqué "(exemple illustratif)".</li>
+      <li><strong>Format.</strong> Situation courte, une seule option clairement correcte et fidèle au mécanisme.</li>
+    </ol>
+  </details>
+
+  <div class="toolbar">
+    <button onclick="loadPending()">Rafraîchir</button>
+    <span id="count" class="card-meta"></span>
+  </div>
+
+  <div id="content"><div class="loading">Chargement…</div></div>
+</div>
+
+<script>
+function apiBase() { return '/admin-editions/api'; }
+function escapeHtml(s) {
+  const d = document.createElement('div');
+  d.textContent = s ?? '';
+  return d.innerHTML;
+}
+
+async function loadPending() {
+  const content = document.getElementById('content');
+  content.innerHTML = '<div class="loading">Chargement…</div>';
+  document.getElementById('count').textContent = '';
+  try {
+    const r = await fetch(apiBase() + '/pending');
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const data = await r.json();
+    renderPending(data.pending || []);
+  } catch (e) {
+    content.innerHTML = `<div class="error">Erreur de chargement : ${escapeHtml(e.message)}</div>`;
+  }
+}
+
+function renderPending(pending) {
+  const content = document.getElementById('content');
+  document.getElementById('count').textContent = `${pending.length} en attente`;
+
+  if (!pending.length) {
+    content.innerHTML = '<div class="empty">Rien en attente — tout est publié ou nettoyé.</div>';
+    return;
+  }
+
+  content.innerHTML = pending.map(cardHtml).join('');
+
+  pending.forEach(p => {
+    document.getElementById('approve-' + cssId(p.date)).onclick = () => act(p.date, 'approve');
+    document.getElementById('reject-' + cssId(p.date)).onclick = () => {
+      const reason = document.getElementById('reason-' + cssId(p.date)).value.trim();
+      act(p.date, 'reject', reason);
+    };
+  });
+}
+
+function cssId(day) { return day.replace(/[^a-zA-Z0-9]/g, ''); }
+
+function cardHtml(p) {
+  const id = cssId(p.date);
+  const mech = p.mechanism || {};
+  const edition = p.edition || {};
+  const audit = p.audit || {};
+  const src = p.source_headline || {};
+  const conf = typeof p.confidence === 'number' ? p.confidence.toFixed(2) : '—';
+
+  const issuesHtml = (audit.issues && audit.issues.length)
+    ? `<div class="issues">
+        <div class="issues-title">Relecture automatique — points signalés</div>
+        <ul>${audit.issues.map(i => `<li>${escapeHtml(i)}</li>`).join('')}</ul>
+       </div>`
+    : '';
+
+  const optionsHtml = (edition.options || []).map(o => `
+    <li class="${o.correct ? 'correct' : ''}">
+      <span class="mark">${o.correct ? '✓ correcte' : '✗'}</span>${escapeHtml(o.text)}
+    </li>`).join('');
+
+  const sourceHtml = src.title
+    ? `<div class="source-box">Actu source : ${
+        src.link && /^https?:\/\//i.test(src.link)
+          ? `<a href="${escapeHtml(src.link)}" target="_blank" rel="noopener noreferrer">${escapeHtml(src.title)}</a>`
+          : escapeHtml(src.title)
+      } — ${escapeHtml(src.source || '')}${src.published ? ' — ' + escapeHtml(src.published.slice(0, 10)) : ''}
+      ${src.summary ? `<br>${escapeHtml(src.summary)}` : ''}</div>`
+    : '<div class="source-box">Pas d\'actu source enregistrée (édition antérieure à ce champ).</div>';
+
+  return `
+  <div class="card">
+    <div class="card-head">
+      <div>
+        <div class="card-title">${escapeHtml(mech.label || p.mechanism_id)}</div>
+        <div class="card-meta">${escapeHtml(p.date)} · confiance rattachement ${conf}</div>
+      </div>
+      <div>
+        <span class="badge badge-category">${escapeHtml(mech.category || '')}</span>
+        ${audit.passed === false ? '<span class="badge badge-audit-fail">relecture : à revoir</span>' : ''}
+        ${p.confidence < 0.7 ? '<span class="badge badge-review">rattachement limite</span>' : ''}
+      </div>
+    </div>
+
+    <div class="reason">${escapeHtml(p.reason || '')}</div>
+    ${issuesHtml}
+
+    <div class="section-label">Mécanisme de référence (figé, jamais modifié par le rédacteur)</div>
+    <div class="mechanism-box">
+      <div class="cause-effect">${escapeHtml(mech.cause_effect || '')}</div>
+      <div>${escapeHtml(mech.explanation || '')}</div>
+    </div>
+
+    <div class="section-label">Rédaction proposée</div>
+    <p class="intro-text">${escapeHtml(edition.intro || '')}</p>
+    <p class="situation-text" style="margin-top:6px;">${escapeHtml(edition.situation || '')}</p>
+    <ul class="options">${optionsHtml}</ul>
+
+    <div class="section-label">Actu réelle fournie au rédacteur</div>
+    ${sourceHtml}
+
+    <div class="actions">
+      <button class="btn-approve" id="approve-${id}">Approuver et publier</button>
+      <input class="reject-reason" id="reason-${id}" type="text" placeholder="Raison du rejet (optionnel)">
+      <button class="btn-reject" id="reject-${id}">Rejeter</button>
+      <span class="action-feedback" id="feedback-${id}"></span>
+    </div>
+  </div>`;
+}
+
+async function act(day, action, reason) {
+  const id = cssId(day);
+  const feedback = document.getElementById('feedback-' + id);
+  const approveBtn = document.getElementById('approve-' + id);
+  const rejectBtn = document.getElementById('reject-' + id);
+  approveBtn.disabled = true;
+  rejectBtn.disabled = true;
+  feedback.textContent = '…';
+  try {
+    const r = await fetch(apiBase() + '/' + action, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ date: day, reason: reason || '' }),
+    });
+    const data = await r.json();
+    if (!r.ok || !data.ok) throw new Error(data.error || ('HTTP ' + r.status));
+    feedback.textContent = action === 'approve' ? '✓ publiée' : '✓ rejetée';
+    setTimeout(loadPending, 600);
+  } catch (e) {
+    feedback.textContent = 'Erreur : ' + e.message;
+    approveBtn.disabled = false;
+    rejectBtn.disabled = false;
+  }
+}
+
+loadPending();
+</script>
+</body>
+</html>
