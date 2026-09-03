@@ -91,9 +91,18 @@ def build_shared_edition_of_the_day() -> dict:
             else:
                 mechanism = get_mechanism(match["mechanism_id"])
                 dressed = dress_edition(mechanism, match["headline"], match["reasoning"])
+                headline = match["headline"]
                 edition = {
                     "date": today, "type": "fraîche", "mechanism_id": mechanism.id,
                     "confidence": match["confidence"], "edition": dressed,
+                    # Traçabilité : permet de vérifier après coup que `situation`
+                    # (dressed par le LLM) est resté fidèle à l'actualité réelle
+                    # fournie, sans devoir refaire confiance à la mémoire du LLM.
+                    "source_headline": {
+                        "title": headline.title, "summary": headline.summary,
+                        "source": headline.source, "link": headline.link,
+                        "published": headline.published.isoformat(),
+                    },
                 }
     except Exception as e:
         # Flux RSS en panne, quota API dépassé, JSON malformé... un jour
