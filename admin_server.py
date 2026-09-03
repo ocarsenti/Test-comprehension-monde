@@ -6,10 +6,16 @@ en revue humaine (voir edition_builder.py).
 Volontairement sans nouvelle dépendance : http.server (stdlib) suffit pour
 un outil interne à trois routes et faible trafic. L'authentification n'est
 JAMAIS gérée ici — ce serveur n'écoute que sur 127.0.0.1, jamais exposé
-directement à internet ; c'est nginx (auth_basic sur /admin-editions/, voir
-apply_nginx_patch_admin_editions.py) qui protège l'accès. Si ce serveur
-tournait un jour sans le reverse-proxy nginx devant lui, N'IMPORTE QUI
-pourrait approuver/rejeter des éditions — ne jamais l'exposer autrement.
+directement à internet ; c'est nginx qui fait le reverse-proxy.
+
+Décision explicite d'Olivier (2026-09-03) : /admin-editions/ n'a PAS de mot
+de passe (auth_basic off, voir apply_nginx_patch_admin_editions_2.py) — la
+seule protection restante est que cette route reste une URL non indexée
+sur un VPS dont l'adresse IP n'est pas publiée. Quiconque connaît ou devine
+l'URL peut approuver/rejeter des éditions. Si ce besoin de protection
+change, réintroduire auth_basic + un htpasswd dédié (schéma déjà utilisé
+pour /naming-tool/ et /nextmove-v5/admin_retest.html) plutôt que de gérer
+l'authentification dans ce fichier.
 
 Lancement manuel : .venv/bin/python3 admin_server.py
 Lancement persistant : voir la ligne crontab @reboot ajoutée par
