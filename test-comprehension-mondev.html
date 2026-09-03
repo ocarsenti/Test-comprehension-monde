@@ -312,12 +312,196 @@
   .map-callout strong { color: var(--text); }
 
   .empty-state { color: var(--text-dim); font-size: 14px; padding: 24px 0; }
+
+  /* --- Menu principal & onglets --- */
+  .home-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 6px; }
+  .home-title { font-size: 22px; margin: 0 0 4px; }
+  .sub-badge {
+    display: inline-block; font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 700;
+    color: var(--success-dark); background: var(--success-bg); border: 1px solid var(--success);
+    border-radius: 999px; padding: 2px 10px; margin-left: 8px; vertical-align: middle;
+  }
+  .icon-btn {
+    background: var(--panel); border: 2px solid var(--line); border-radius: 14px;
+    width: 46px; height: 46px; font-size: 20px; cursor: pointer; flex-shrink: 0;
+  }
+  .icon-btn:hover { border-color: var(--accent); }
+
+  .back-link {
+    background: none; border: none; color: var(--text-dim); font-family: 'Nunito', sans-serif;
+    font-weight: 700; font-size: 14px; cursor: pointer; padding: 0 0 14px; display: inline-flex; align-items: center; gap: 4px;
+  }
+  .back-link:hover { color: var(--accent-dark); }
+
+  .tab-bar { display: flex; gap: 8px; margin: 22px 0 18px; border-bottom: 2px solid var(--line); }
+  .tab-btn {
+    flex: 1; background: none; border: none; padding: 10px 6px 12px;
+    font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 14px; color: var(--text-dim);
+    cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -2px;
+  }
+  .tab-btn.active { color: var(--accent-dark); border-bottom-color: var(--accent); }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  .mech-row {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    width: 100%; text-align: left; background: #fff; border: 2px solid var(--line);
+    border-radius: 14px; padding: 12px 16px; margin-bottom: 10px; cursor: pointer;
+    font-family: 'Nunito', sans-serif;
+  }
+  .mech-row:hover { border-color: var(--accent); background: var(--accent-bg); }
+  .mech-row-main { display: flex; flex-direction: column; gap: 6px; }
+  .mech-row-label { font-weight: 800; font-size: 14px; color: var(--text); }
+  .mech-row-tag { margin: 0; align-self: flex-start; }
+  .mech-row-count {
+    font-family: 'IBM Plex Mono', monospace; font-weight: 700; font-size: 13px;
+    color: var(--text-dim); white-space: nowrap;
+  }
+  .mech-row-count.mastered { color: var(--success-dark); }
+
+  .modal-overlay {
+    display: none; position: fixed; inset: 0; background: rgba(28,43,58,0.45);
+    z-index: 50; align-items: flex-end; justify-content: center;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal {
+    background: var(--bg); width: 100%; max-width: 560px; max-height: 82vh; overflow-y: auto;
+    border-radius: 22px 22px 0 0; padding: 22px 20px 28px;
+  }
+  @media (min-width: 620px) {
+    .modal-overlay { align-items: center; }
+    .modal { border-radius: 22px; max-height: 80vh; }
+  }
+  .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+  .modal-header h2 { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 19px; margin: 0; }
+  .modal-close {
+    background: none; border: none; font-size: 24px; color: var(--text-dim); cursor: pointer; padding: 4px;
+  }
+
+  .notif-row {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 12px 4px; border-bottom: 1px solid var(--line); font-size: 14px; font-weight: 700;
+  }
+  .switch { position: relative; display: inline-block; width: 44px; height: 26px; flex-shrink: 0; }
+  .switch input { opacity: 0; width: 0; height: 0; }
+  .switch-track {
+    position: absolute; inset: 0; background: var(--line); border-radius: 999px; cursor: pointer; transition: 0.2s;
+  }
+  .switch-track::before {
+    content: ""; position: absolute; width: 20px; height: 20px; left: 3px; top: 3px;
+    background: #fff; border-radius: 50%; transition: 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.25);
+  }
+  .switch input:checked + .switch-track { background: var(--accent); }
+  .switch input:checked + .switch-track::before { transform: translateX(18px); }
+
+  .toast {
+    position: fixed; left: 50%; bottom: 26px; transform: translateX(-50%) translateY(20px);
+    background: var(--text); color: #fff; font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 13px;
+    padding: 12px 20px; border-radius: 999px; opacity: 0; pointer-events: none; transition: 0.25s;
+    z-index: 60; max-width: 90%; text-align: center; box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  .paywall {
+    background: var(--accent-bg); border: 2px solid var(--accent); border-radius: 18px;
+    padding: 20px 20px 22px; text-align: center; margin-top: 6px;
+  }
+  .paywall-title { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 17px; margin: 0 0 8px; color: var(--accent-dark); }
+  .paywall-text { color: var(--text-dim); font-size: 13px; margin: 0 0 16px; }
+  .paywall-cta { box-shadow: 0 4px 0 var(--accent-dark); }
+  .paywall-note { color: var(--text-dim); font-size: 11px; margin: 12px 0 0; font-style: italic; }
+
+  .encounter-card {
+    background: var(--panel); border: 2px solid var(--line); border-radius: 14px;
+    padding: 12px 16px; margin-bottom: 12px;
+  }
+  .encounter-date {
+    display: block; font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 700;
+    color: var(--accent-dark); margin-bottom: 6px;
+  }
+  .encounter-situation { font-size: 13px; font-weight: 700; margin: 0 0 6px; color: var(--text); }
+  .encounter-explain { font-size: 13px; margin: 0 0 6px; color: var(--text-dim); }
+  .encounter-source { font-size: 11px; margin: 0; color: var(--text-dim); font-style: italic; }
+
+  .mind-legend {
+    display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; font-size: 12px; color: var(--text-dim);
+    margin: 6px 0 4px;
+  }
+  .mind-legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .legend-dot { width: 11px; height: 11px; border-radius: 50%; display: inline-block; border: 2px solid; }
+  .legend-none { background: var(--panel); border-color: var(--line); }
+  .legend-started { background: var(--accent-bg); border-color: var(--accent); }
+  .legend-mastered { background: var(--accent); border-color: var(--accent-dark); }
+
+  .mind-edge { stroke: var(--line); stroke-width: 1.5; }
+  .mind-hub { fill: var(--panel-hover); stroke: var(--line); stroke-width: 2; }
+  .mind-hub-label { fill: var(--text); font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 10px; text-anchor: middle; }
+  .mind-node-none circle { fill: var(--panel); stroke: var(--line); }
+  .mind-node-started circle { fill: var(--accent-bg); stroke: var(--accent); stroke-width: 2.5; }
+  .mind-node-mastered circle { fill: var(--accent); stroke: var(--accent-dark); stroke-width: 2.5; }
+  .mind-node-label {
+    font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 9.5px; text-anchor: middle; fill: var(--text);
+  }
+  .mind-node-mastered .mind-node-count { fill: #fff; }
+  .mind-node-count {
+    font-family: 'IBM Plex Mono', monospace; font-weight: 700; font-size: 9px; text-anchor: middle; fill: var(--text-dim);
+  }
 </style>
 </head>
 <body>
 <div class="wrap">
 
-  <div id="intro" class="screen active">
+  <div id="home" class="screen active">
+    <div class="home-header">
+      <div>
+        <p class="eyebrow">Le monde en mécanismes</p>
+        <h1 class="home-title">Ton tableau de bord<span class="sub-badge" id="subBadge" style="display:none;">Abonné</span></h1>
+      </div>
+      <button class="icon-btn" onclick="openNotifModal()" aria-label="Notifications">🔔</button>
+    </div>
+    <p class="sub" style="margin-bottom:18px;">Un mécanisme réel par jour, illustré par une vraie actualité. Devine d'abord, comprends ensuite.</p>
+    <button class="cta" onclick="goToDailyQuiz()">Jouer le mécanisme du jour</button>
+
+    <div class="tab-bar">
+      <button class="tab-btn active" data-tab="mechanisms" onclick="switchTab('mechanisms')">Mes mécanismes</button>
+      <button class="tab-btn" data-tab="mindmap" onclick="switchTab('mindmap')">Carte mentale</button>
+    </div>
+
+    <div id="tabMechanisms" class="tab-panel active">
+      <div id="tabMechanismsContent"></div>
+    </div>
+    <div id="tabMindmap" class="tab-panel">
+      <div id="tabMindmapContent"></div>
+    </div>
+  </div>
+
+  <div id="mechDetailModal" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="mechDetailTitle"></h2>
+        <button class="modal-close" onclick="closeMechDetail()" aria-label="Fermer">×</button>
+      </div>
+      <span class="tag" id="mechDetailTag"></span>
+      <div id="mechDetailBody" style="margin-top:14px;"></div>
+    </div>
+  </div>
+
+  <div id="notifModal" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Notifications</h2>
+        <button class="modal-close" onclick="closeNotifModal()" aria-label="Fermer">×</button>
+      </div>
+      <p class="sub" style="margin:0 0 16px;">Choisis les catégories pour lesquelles tu veux être prévenu quand un nouveau mécanisme est publié.</p>
+      <div id="notifList"></div>
+      <button class="cta" style="margin-top:18px;" onclick="simulatePublication()">Simuler une publication (démo)</button>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <div id="intro" class="screen">
+    <button class="back-link" onclick="backToHome()">← Accueil</button>
     <p class="eyebrow">Avant de commencer</p>
     <div class="intro-hero">
       <img class="intro-john" src="john-intro-cutout.png" alt="John">
@@ -362,6 +546,7 @@
       <p class="sub" style="margin: 0 auto;">Sur 10, quelle envie aurais-tu de revenir demain pour une seule nouvelle question comme ça ?</p>
       <div class="scale" id="scale"></div>
       <p class="thanks" id="thanks">Merci — c'est exactement ce qu'on cherchait à savoir.</p>
+      <button class="cta" style="margin-top:18px;" onclick="backToHome()">Retour à l'accueil</button>
     </div>
 
   </div>
@@ -372,6 +557,70 @@
 const JOHN_VARIANTS = ["john-2-cutout.png", "john-3-cutout.png"];
 const AVATAR = { "John": "john-2-cutout.png", "Véronica": "veronica-cutout.png", "Dan": "dan-cutout.png" };
 let QUESTIONS = [];
+
+// Catégories réelles du pool (mechanisms_pool.py, 49 mécanismes) — effectifs figés au 2026-09-02.
+const CATEGORIES = [
+  { id: "économique", label: "Économie", total: 5 },
+  { id: "institutionnel", label: "Institutions", total: 5 },
+  { id: "commerce", label: "Commerce", total: 4 },
+  { id: "démographie/migration", label: "Démographie & migration", total: 4 },
+  { id: "géopolitique", label: "Géopolitique", total: 4 },
+  { id: "géologique/climatique", label: "Géologie & climat", total: 4 },
+  { id: "vulnérabilité", label: "Vulnérabilité", total: 4 },
+  { id: "biologique", label: "Biologique", total: 4 },
+  { id: "écologique", label: "Écologique", total: 4 },
+  { id: "technologique", label: "Technologique", total: 3 },
+  { id: "psychologique", label: "Psychologique", total: 4 },
+  { id: "juridique", label: "Juridique", total: 4 },
+];
+
+const LS_KEYS = { subscribed: "cm_subscribed", notifPrefs: "cm_notif_prefs", history: "cm_history" };
+
+function loadJSONLS(key, fallback) {
+  try {
+    const raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : fallback;
+  } catch (e) { return fallback; }
+}
+function saveJSONLS(key, val) {
+  try { localStorage.setItem(key, JSON.stringify(val)); } catch (e) {}
+}
+
+function isSubscribed() { return localStorage.getItem(LS_KEYS.subscribed) === "true"; }
+function setSubscribed(val) { localStorage.setItem(LS_KEYS.subscribed, val ? "true" : "false"); }
+
+function getNotifPrefs() {
+  const stored = loadJSONLS(LS_KEYS.notifPrefs, null);
+  if (stored) return stored;
+  const defaults = {};
+  CATEGORIES.forEach(c => defaults[c.id] = false);
+  return defaults;
+}
+function setNotifPref(catId, val) {
+  const prefs = getNotifPrefs();
+  prefs[catId] = val;
+  saveJSONLS(LS_KEYS.notifPrefs, prefs);
+}
+
+function getHistory() { return loadJSONLS(LS_KEYS.history, {}); }
+
+// Règle d'or : une actu n'entre dans l'historique personnel que si elle est consultée
+// le jour même où elle est proposée (q.date === date réelle du jour). Manquée = perdue
+// pour toujours — c'est voulu, ça crée l'incitation à revenir chaque jour.
+function recordConsultation(q) {
+  const todayStr = new Date().toISOString().slice(0, 10);
+  if (q.date !== todayStr) return;
+  const history = getHistory();
+  const entry = history[q.mechanism_id] || {
+    label: q.mechanism_label, category: q.category, cause_effect: q.cause_effect, encounters: []
+  };
+  const already = entry.encounters.some(e => e.date === q.date);
+  if (!already) {
+    entry.encounters.push({ date: q.date, situation: q.situation, explanation: q.explanation, source: q.source });
+  }
+  history[q.mechanism_id] = entry;
+  saveJSONLS(LS_KEYS.history, history);
+}
 
 function escapeHtml(s) {
   const d = document.createElement('div');
@@ -407,6 +656,18 @@ function renderIntro() {
   sample.innerHTML = `Ce test t'en propose un échantillon de <strong>${n}, tirés de vraies actualités récentes</strong>, rapprochées automatiquement chaque jour d'un mécanisme du pool. Devine d'abord, comprends ensuite.`;
 }
 
+function goToDailyQuiz() {
+  document.getElementById('home').classList.remove('active');
+  document.getElementById('intro').classList.add('active');
+}
+
+function backToHome() {
+  document.getElementById('intro').classList.remove('active');
+  document.getElementById('quizArea').classList.remove('active');
+  document.getElementById('home').classList.add('active');
+  renderHome();
+}
+
 function startQuiz() {
   document.getElementById('intro').classList.remove('active');
   document.getElementById('quizArea').classList.add('active');
@@ -415,7 +676,7 @@ function startQuiz() {
 
 function exitQuiz() {
   document.getElementById('quizArea').classList.remove('active');
-  document.getElementById('intro').classList.add('active');
+  backToHome();
 }
 
 function updateProgress(idx) {
@@ -477,6 +738,8 @@ function buildTrack() {
     `;
     track.appendChild(panel);
   });
+
+  if (QUESTIONS.length > 0) recordConsultation(QUESTIONS[0]);
 }
 
 function answer(n, correct, btn) {
@@ -506,6 +769,7 @@ function go(n) {
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.getElementById('p' + n).classList.add('active');
   updateProgress(n);
+  recordConsultation(QUESTIONS[n - 1]);
 }
 
 function buildPersonalMap() {
@@ -588,6 +852,183 @@ function finish() {
   }
 }
 
+/* ---------- Menu principal : onglets, paywall, notifications ---------- */
+
+function renderPaywallBanner() {
+  return `<div class="paywall">
+    <p class="paywall-title">Débloquer l'historique complet</p>
+    <p class="paywall-text">Retrouve tous tes mécanismes rencontrés, leur historique détaillé actu par actu, et ta carte mentale de progression par catégorie.</p>
+    <button class="cta paywall-cta" onclick="unlockSubscription()">Débloquer pour 2,99€/mois</button>
+    <p class="paywall-note">Démo de test : ce bouton active juste l'accès en local, aucun vrai paiement n'est déclenché.</p>
+  </div>`;
+}
+
+function unlockSubscription() {
+  setSubscribed(true);
+  renderHome();
+}
+
+function renderHome() {
+  const badge = document.getElementById('subBadge');
+  badge.style.display = isSubscribed() ? 'inline-block' : 'none';
+  renderMechanismsTab();
+  renderMindMapTab();
+}
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  document.getElementById('tabMechanisms').classList.toggle('active', tab === 'mechanisms');
+  document.getElementById('tabMindmap').classList.toggle('active', tab === 'mindmap');
+}
+
+function renderMechanismsTab() {
+  const container = document.getElementById('tabMechanismsContent');
+  if (!isSubscribed()) {
+    container.innerHTML = renderPaywallBanner();
+    return;
+  }
+  const history = getHistory();
+  const ids = Object.keys(history);
+  if (ids.length === 0) {
+    container.innerHTML = '<p class="empty-state">Aucun mécanisme rencontré pour l\'instant — ouvre le mécanisme du jour pour commencer ta liste. Attention, ne le rate pas : une actu non consultée le jour même n\'entre jamais dans l\'historique.</p>';
+    return;
+  }
+  ids.sort((a, b) => history[b].encounters.length - history[a].encounters.length);
+  container.innerHTML = ids.map(id => {
+    const m = history[id];
+    const n = m.encounters.length;
+    const mastered = n >= 3;
+    return `<button class="mech-row" onclick="openMechDetail('${id}')">
+      <div class="mech-row-main">
+        <span class="mech-row-label">${escapeHtml(m.label)}</span>
+        <span class="tag mech-row-tag">${escapeHtml(m.category)}</span>
+      </div>
+      <span class="mech-row-count${mastered ? ' mastered' : ''}">x${n}${mastered ? ' ✓ maîtrisé' : ''}</span>
+    </button>`;
+  }).join('');
+}
+
+function openMechDetail(id) {
+  const history = getHistory();
+  const m = history[id];
+  if (!m) return;
+  document.getElementById('mechDetailTitle').textContent = m.label;
+  document.getElementById('mechDetailTag').textContent = m.category;
+  document.getElementById('mechDetailBody').innerHTML = m.encounters.slice().reverse().map(e => `
+    <div class="encounter-card">
+      <span class="encounter-date">${escapeHtml(e.date)}</span>
+      <p class="encounter-situation">${escapeHtml(e.situation)}</p>
+      <p class="encounter-explain">${escapeHtml(e.explanation)}</p>
+      <p class="encounter-source">Source : ${escapeHtml(e.source)}</p>
+    </div>
+  `).join('');
+  document.getElementById('mechDetailModal').classList.add('show');
+}
+
+function closeMechDetail() {
+  document.getElementById('mechDetailModal').classList.remove('show');
+}
+
+function renderMindMapTab() {
+  const container = document.getElementById('tabMindmapContent');
+  if (!isSubscribed()) {
+    container.innerHTML = renderPaywallBanner();
+    return;
+  }
+  container.innerHTML = `
+    <svg class="map-svg" id="mindMapSvg" viewBox="0 0 400 400" role="img" aria-label="Carte mentale des catégories de mécanismes"></svg>
+    <div class="mind-legend">
+      <span><span class="legend-dot legend-none"></span> Pas encore rencontré</span>
+      <span><span class="legend-dot legend-started"></span> Rencontré</span>
+      <span><span class="legend-dot legend-mastered"></span> Maîtrisé (≥3 réactivations)</span>
+    </div>
+  `;
+  buildMindMap();
+}
+
+function buildMindMap() {
+  const svg = document.getElementById('mindMapSvg');
+  const history = getHistory();
+  const cx = 200, cy = 205, rx = 165, ry = 165;
+  const n = CATEGORIES.length;
+  const nodePos = CATEGORIES.map((cat, idx) => {
+    const angle = (2 * Math.PI * idx) / n - Math.PI / 2;
+    return { x: cx + rx * Math.cos(angle), y: cy + ry * Math.sin(angle), cat };
+  });
+
+  let html = '';
+  nodePos.forEach(p => {
+    html += `<line class="mind-edge" x1="${cx}" y1="${cy}" x2="${p.x.toFixed(1)}" y2="${p.y.toFixed(1)}" />`;
+  });
+  html += `<circle class="mind-hub" cx="${cx}" cy="${cy}" r="28" /><text class="mind-hub-label" x="${cx}" y="${cy - 3}">Mes</text><text class="mind-hub-label" x="${cx}" y="${cy + 9}">mécanismes</text>`;
+
+  nodePos.forEach(p => {
+    const idsInCat = Object.keys(history).filter(id => history[id].category === p.cat.id);
+    const encountered = idsInCat.length;
+    const mastered = idsInCat.filter(id => history[id].encounters.length >= 3).length;
+    const ratio = Math.min(1, encountered / p.cat.total);
+    const r = 20 + ratio * 10;
+    const level = mastered > 0 ? 'mastered' : encountered > 0 ? 'started' : 'none';
+    html += `<g class="mind-node mind-node-${level}">
+      <circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${r.toFixed(1)}" />
+      <text class="mind-node-label" x="${p.x.toFixed(1)}" y="${(p.y - r - 8).toFixed(1)}">${escapeHtml(p.cat.label)}</text>
+      <text class="mind-node-count" x="${p.x.toFixed(1)}" y="${(p.y + 3).toFixed(1)}">${encountered}/${p.cat.total}</text>
+    </g>`;
+  });
+
+  svg.innerHTML = html;
+}
+
+function openNotifModal() {
+  renderNotifList();
+  document.getElementById('notifModal').classList.add('show');
+}
+function closeNotifModal() {
+  document.getElementById('notifModal').classList.remove('show');
+}
+
+function renderNotifList() {
+  const prefs = getNotifPrefs();
+  document.getElementById('notifList').innerHTML = CATEGORIES.map(cat => `
+    <div class="notif-row">
+      <span>${escapeHtml(cat.label)}</span>
+      <label class="switch">
+        <input type="checkbox" ${prefs[cat.id] ? 'checked' : ''} onchange="toggleNotifPref('${cat.id}', this.checked)">
+        <span class="switch-track"></span>
+      </label>
+    </div>
+  `).join('');
+}
+
+function toggleNotifPref(catId, val) {
+  setNotifPref(catId, val);
+  const cat = CATEGORIES.find(c => c.id === catId);
+  showToast(val ? `Tu seras notifié pour « ${cat.label} »` : `Notifications désactivées pour « ${cat.label} »`);
+}
+
+// Démo uniquement : simule côté client la réception d'une notification.
+// En production, remplacer par l'API Notifications du navigateur (avec demande de
+// permission explicite) ou par un service de push notification pour la version mobile.
+function simulatePublication() {
+  const prefs = getNotifPrefs();
+  const active = CATEGORIES.filter(c => prefs[c.id]);
+  if (active.length === 0) {
+    showToast("Active au moins une catégorie pour voir une simulation.");
+    return;
+  }
+  const cat = active[Math.floor(Math.random() * active.length)];
+  showToast(`🔔 Nouveau mécanisme publié en « ${cat.label} » !`);
+}
+
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(() => toast.classList.remove('show'), 2600);
+}
+
+renderHome();
 loadEdition();
 </script>
 </body>
