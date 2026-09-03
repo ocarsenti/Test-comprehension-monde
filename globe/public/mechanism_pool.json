@@ -1,0 +1,298 @@
+{
+  "mechanisms": [
+    {
+      "id": "smic_revalorisation_automatique",
+      "category": "économique",
+      "label": "Revalorisation automatique du SMIC",
+      "cause_effect": "Inflation des 20% de ménages les plus modestes > 2%→hausse automatique du SMIC"
+    },
+    {
+      "id": "nominal_vs_reel",
+      "category": "économique",
+      "label": "Valeur nominale vs valeur réelle",
+      "cause_effect": "Hausse nominale affichée→pouvoir d'achat réel pas forcément en hausse"
+    },
+    {
+      "id": "banque_centrale_taux",
+      "category": "économique",
+      "label": "Relèvement des taux directeurs",
+      "cause_effect": "Taux directeurs relevés→crédit plus cher, consommation freinée"
+    },
+    {
+      "id": "inflation_importee",
+      "category": "économique",
+      "label": "Inflation importée",
+      "cause_effect": "Matière première ou devise qui flambe à l'étranger→prix intérieurs qui grimpent"
+    },
+    {
+      "id": "dette_souveraine",
+      "category": "économique",
+      "label": "Coût de la dette souveraine",
+      "cause_effect": "Confiance des marchés dégradée→coût d'emprunt de l'État qui augmente"
+    },
+    {
+      "id": "veto_unanimite_conseil_ue",
+      "category": "institutionnel",
+      "label": "Unanimité et droit de veto au Conseil de l'UE",
+      "cause_effect": "Un seul pays membre s'oppose→décision européenne bloquée"
+    },
+    {
+      "id": "vote_trilogue_delai",
+      "category": "institutionnel",
+      "label": "Trilogue européen et délai de mise en œuvre",
+      "cause_effect": "Texte européen adopté→application réelle des années plus tard"
+    },
+    {
+      "id": "cbam_dilemme_strategique",
+      "category": "institutionnel",
+      "label": "Arbitrage décarbonation vs statu quo (CBAM)",
+      "cause_effect": "Taxe carbone aux frontières→arbitrage décarboner tout de suite ou risquer plus tard"
+    },
+    {
+      "id": "independance_banque_centrale",
+      "category": "institutionnel",
+      "label": "Indépendance de la banque centrale",
+      "cause_effect": "Statut d'indépendance→gouvernement ne peut pas dicter la politique monétaire"
+    },
+    {
+      "id": "referendum_ratification",
+      "category": "institutionnel",
+      "label": "Ratification par référendum",
+      "cause_effect": "Référendum national négatif→accord international suspendu pour tous"
+    },
+    {
+      "id": "droits_douane_guerre_commerciale",
+      "category": "commerce",
+      "label": "Répercussion d'un droit de douane",
+      "cause_effect": "Droit de douane imposé→prix répercuté ou fournisseur changé"
+    },
+    {
+      "id": "repercussion_transport_prix",
+      "category": "commerce",
+      "label": "Répercussion d'un coût de transport",
+      "cause_effect": "Coût de transport en hausse→prix final répercuté jusqu'au consommateur"
+    },
+    {
+      "id": "substitution_fournisseur",
+      "category": "commerce",
+      "label": "Substitution de fournisseur",
+      "cause_effect": "Fournisseur devenu trop risqué ou cher→recherche d'un substitut"
+    },
+    {
+      "id": "embargo_contournement",
+      "category": "commerce",
+      "label": "Contournement d'un embargo",
+      "cause_effect": "Embargo bilatéral→flux détourné via un pays tiers"
+    },
+    {
+      "id": "vieillissement_demographique",
+      "category": "démographie/migration",
+      "label": "Vieillissement démographique",
+      "cause_effect": "Rapport actifs/retraités qui se dégrade→dépenses sociales en hausse mécanique"
+    },
+    {
+      "id": "remittances_developpement",
+      "category": "démographie/migration",
+      "label": "Transferts de fonds des migrants (remittances)",
+      "cause_effect": "Crise économique chez les migrants→recul direct des transferts vers le pays d'origine"
+    },
+    {
+      "id": "exode_rural",
+      "category": "démographie/migration",
+      "label": "Exode rural et urbanisation accélérée",
+      "cause_effect": "Opportunités concentrées en ville→urbanisation plus rapide que les infrastructures"
+    },
+    {
+      "id": "crise_accueil_migratoire",
+      "category": "démographie/migration",
+      "label": "Arbitrage capacité d'accueil vs urgence humanitaire",
+      "cause_effect": "Afflux migratoire soudain→arbitrage entre tension sociale et coût humain du refus"
+    },
+    {
+      "id": "sanctions_economiques_ricochet",
+      "category": "géopolitique",
+      "label": "Effet de ricochet des sanctions économiques",
+      "cause_effect": "Sanction imposée à un pays→effet de ricochet chez les alliés de qui sanctionne"
+    },
+    {
+      "id": "alliance_defense_collective",
+      "category": "géopolitique",
+      "label": "Clause de défense collective",
+      "cause_effect": "Attaque contre un membre→engagement automatique de toute l'alliance"
+    },
+    {
+      "id": "couloir_maritime_strategique",
+      "category": "géopolitique",
+      "label": "Verrou d'un couloir maritime stratégique",
+      "cause_effect": "Détroit stratégique bloqué→prix de l'énergie qui grimpe loin de la zone"
+    },
+    {
+      "id": "course_influence_regionale",
+      "category": "géopolitique",
+      "label": "Arbitrage entre puissances rivales",
+      "cause_effect": "Rapprochement avec une puissance→dépendance et hostilité de l'autre camp"
+    },
+    {
+      "id": "variabilite_mousson",
+      "category": "géologique/climatique",
+      "label": "Variabilité de l'intensité de la mousson",
+      "cause_effect": "Intensité de la mousson qui varie→crue plus ou moins dévastatrice"
+    },
+    {
+      "id": "subduction_sismique",
+      "category": "géologique/climatique",
+      "label": "Zone de subduction et récurrence sismique",
+      "cause_effect": "Contrainte tectonique accumulée→séisme récurrent mais imprévisible dans le détail"
+    },
+    {
+      "id": "elevation_niveau_mer",
+      "category": "géologique/climatique",
+      "label": "Élévation du niveau de la mer",
+      "cause_effect": "Niveau moyen des mers qui monte→inondations côtières plus fréquentes"
+    },
+    {
+      "id": "secheresse_recurrente",
+      "category": "géologique/climatique",
+      "label": "Sécheresse récurrente et déficit cumulatif",
+      "cause_effect": "Déficit hydrique cumulé sur plusieurs années→sécheresse même sans année exceptionnelle"
+    },
+    {
+      "id": "vulnerabilite_differenciee_catastrophe",
+      "category": "vulnérabilité",
+      "label": "Vulnérabilité différenciée face à une catastrophe",
+      "cause_effect": "Vulnérabilité du territoire→dégâts très différents à aléa comparable"
+    },
+    {
+      "id": "vulnerabilite_composant_reutilise",
+      "category": "vulnérabilité",
+      "label": "Faille dans un composant technique mutualisé",
+      "cause_effect": "Faille dans un composant partagé→exposition simultanée de tous ses utilisateurs"
+    },
+    {
+      "id": "zone_inondable_urbanisation",
+      "category": "vulnérabilité",
+      "label": "Urbanisation d'une zone inondable",
+      "cause_effect": "Construction en zone inondable→exposition humaine au risque, pas le risque lui-même"
+    },
+    {
+      "id": "habitat_informel_risque",
+      "category": "vulnérabilité",
+      "label": "Concentration du risque en habitat informel",
+      "cause_effect": "Terrain le moins cher, donc le plus exposé→risque concentré sur l'habitat informel"
+    },
+    {
+      "id": "resistance_antibiotique",
+      "category": "biologique",
+      "label": "Sélection de résistance aux antibiotiques",
+      "cause_effect": "Usage fréquent d'un antibiotique→sélection des souches résistantes"
+    },
+    {
+      "id": "zoonose_transmission",
+      "category": "biologique",
+      "label": "Transmission zoonotique",
+      "cause_effect": "Contact intensifié humains/animaux→franchissement de la barrière d'espèce"
+    },
+    {
+      "id": "epidemie_saisonniere",
+      "category": "biologique",
+      "label": "Récurrence saisonnière d'une épidémie",
+      "cause_effect": "Conditions saisonnières propices→récurrence annuelle d'intensité variable"
+    },
+    {
+      "id": "espece_invasive_ecosysteme",
+      "category": "biologique",
+      "label": "Déséquilibre par une espèce invasive",
+      "cause_effect": "Espèce introduite sans prédateur naturel→chaîne alimentaire déséquilibrée"
+    },
+    {
+      "id": "choc_matiere_premiere",
+      "category": "écologique",
+      "label": "Choc sur une matière première",
+      "cause_effect": "Choc sur une matière première→prix répercuté sur toute une chaîne de produits"
+    },
+    {
+      "id": "surexploitation_ressource",
+      "category": "écologique",
+      "label": "Surexploitation d'une ressource commune",
+      "cause_effect": "Ressource commune sans limite individuelle→épuisement collectif malgré des comportements rationnels"
+    },
+    {
+      "id": "pollinisateurs_dependance_agricole",
+      "category": "écologique",
+      "label": "Dépendance agricole aux pollinisateurs",
+      "cause_effect": "Déclin des pollinisateurs→rendement agricole en baisse, sans lien visible sur le terrain"
+    },
+    {
+      "id": "canicule_urbaine_ilot_chaleur",
+      "category": "écologique",
+      "label": "Îlot de chaleur urbain",
+      "cause_effect": "Bitume et béton sans végétation→chaleur stockée puis restituée la nuit"
+    },
+    {
+      "id": "dependance_fournisseur_cloud_unique",
+      "category": "technologique",
+      "label": "Dépendance à un fournisseur cloud unique",
+      "cause_effect": "Panne chez un grand fournisseur cloud→services multiples touchés au même moment"
+    },
+    {
+      "id": "obsolescence_programmee_reglementee",
+      "category": "technologique",
+      "label": "Arbitrage durée de vie produit vs coût de réparation",
+      "cause_effect": "Produit conçu pour durer plus longtemps→coût de conception plus élevé, marché renouvelé plus lentement"
+    },
+    {
+      "id": "cybersecurite_chaine_approvisionnement",
+      "category": "technologique",
+      "label": "Attaque par la chaîne d'approvisionnement logicielle",
+      "cause_effect": "Prestataire tiers moins protégé mais avec accès légitime→porte d'entrée vers la cible réelle"
+    },
+    {
+      "id": "biais_ancrage_negociation",
+      "category": "psychologique",
+      "label": "Biais d'ancrage dans une négociation",
+      "cause_effect": "Premier chiffre annoncé→point de référence qui influence tout l'accord final"
+    },
+    {
+      "id": "effet_rarete_decision",
+      "category": "psychologique",
+      "label": "Effet de rareté sur la décision",
+      "cause_effect": "Opportunité perçue comme limitée dans le temps→décision plus rapide, moins réfléchie"
+    },
+    {
+      "id": "aversion_perte_investissement",
+      "category": "psychologique",
+      "label": "Aversion à la perte et coûts irrécupérables",
+      "cause_effect": "Argent déjà investi→poursuite d'un projet perdant pour ne pas 'perdre pour rien'"
+    },
+    {
+      "id": "desinformation_viralite",
+      "category": "psychologique",
+      "label": "Viralité de la désinformation",
+      "cause_effect": "Contenu qui déclenche une émotion forte→partage plus rapide qu'un démenti factuel"
+    },
+    {
+      "id": "jurisprudence_precedent_contraignant",
+      "category": "juridique",
+      "label": "Précédent jurisprudentiel contraignant",
+      "cause_effect": "Décision de justice sur un cas→référence contraignante pour les cas similaires"
+    },
+    {
+      "id": "extraterritorialite_droit",
+      "category": "juridique",
+      "label": "Extraterritorialité du droit",
+      "cause_effect": "Transaction touchant un marché ou une monnaie→droit étranger applicable même sans présence locale"
+    },
+    {
+      "id": "class_action_collective",
+      "category": "juridique",
+      "label": "Arbitrage réparation collective vs procès individuels",
+      "cause_effect": "Préjudice de masse→arbitrage entre réparation collective diluée et procès individuels hors de portée"
+    },
+    {
+      "id": "prescription_delai_recours",
+      "category": "juridique",
+      "label": "Prescription et délai de recours",
+      "cause_effect": "Délai de prescription dépassé→fait établi mais recours devenu irrecevable"
+    }
+  ]
+}

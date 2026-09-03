@@ -433,18 +433,9 @@
   .legend-started { background: var(--accent-bg); border-color: var(--accent); }
   .legend-mastered { background: var(--accent); border-color: var(--accent-dark); }
 
-  .mind-edge { stroke: var(--line); stroke-width: 1.5; }
-  .mind-hub { fill: var(--panel-hover); stroke: var(--line); stroke-width: 2; }
-  .mind-hub-label { fill: var(--text); font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 10px; text-anchor: middle; }
-  .mind-node-none circle { fill: var(--panel); stroke: var(--line); }
-  .mind-node-started circle { fill: var(--accent-bg); stroke: var(--accent); stroke-width: 2.5; }
-  .mind-node-mastered circle { fill: var(--accent); stroke: var(--accent-dark); stroke-width: 2.5; }
-  .mind-node-label {
-    font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 9.5px; text-anchor: middle; fill: var(--text);
-  }
-  .mind-node-mastered .mind-node-count { fill: #fff; }
-  .mind-node-count {
-    font-family: 'IBM Plex Mono', monospace; font-weight: 700; font-size: 9px; text-anchor: middle; fill: var(--text-dim);
+  .globe-embed {
+    display: block; width: 100%; height: 60vh; min-height: 380px; max-height: 560px;
+    border: none; border-radius: 18px; background: #0a0c12;
   }
 </style>
 </head>
@@ -936,47 +927,13 @@ function renderMindMapTab() {
     return;
   }
   container.innerHTML = `
-    <svg class="map-svg" id="mindMapSvg" viewBox="0 0 400 400" role="img" aria-label="Carte mentale des catégories de mécanismes"></svg>
+    <iframe src="/globe/?embed=1" class="globe-embed" title="Globe des mécanismes" loading="lazy"></iframe>
     <div class="mind-legend">
       <span><span class="legend-dot legend-none"></span> Pas encore rencontré</span>
       <span><span class="legend-dot legend-started"></span> Rencontré</span>
       <span><span class="legend-dot legend-mastered"></span> Maîtrisé (≥3 réactivations)</span>
     </div>
   `;
-  buildMindMap();
-}
-
-function buildMindMap() {
-  const svg = document.getElementById('mindMapSvg');
-  const history = getHistory();
-  const cx = 200, cy = 205, rx = 165, ry = 165;
-  const n = CATEGORIES.length;
-  const nodePos = CATEGORIES.map((cat, idx) => {
-    const angle = (2 * Math.PI * idx) / n - Math.PI / 2;
-    return { x: cx + rx * Math.cos(angle), y: cy + ry * Math.sin(angle), cat };
-  });
-
-  let html = '';
-  nodePos.forEach(p => {
-    html += `<line class="mind-edge" x1="${cx}" y1="${cy}" x2="${p.x.toFixed(1)}" y2="${p.y.toFixed(1)}" />`;
-  });
-  html += `<circle class="mind-hub" cx="${cx}" cy="${cy}" r="28" /><text class="mind-hub-label" x="${cx}" y="${cy - 3}">Mes</text><text class="mind-hub-label" x="${cx}" y="${cy + 9}">mécanismes</text>`;
-
-  nodePos.forEach(p => {
-    const idsInCat = Object.keys(history).filter(id => history[id].category === p.cat.id);
-    const encountered = idsInCat.length;
-    const mastered = idsInCat.filter(id => history[id].encounters.length >= 3).length;
-    const ratio = Math.min(1, encountered / p.cat.total);
-    const r = 20 + ratio * 10;
-    const level = mastered > 0 ? 'mastered' : encountered > 0 ? 'started' : 'none';
-    html += `<g class="mind-node mind-node-${level}">
-      <circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${r.toFixed(1)}" />
-      <text class="mind-node-label" x="${p.x.toFixed(1)}" y="${(p.y - r - 8).toFixed(1)}">${escapeHtml(p.cat.label)}</text>
-      <text class="mind-node-count" x="${p.x.toFixed(1)}" y="${(p.y + 3).toFixed(1)}">${encountered}/${p.cat.total}</text>
-    </g>`;
-  });
-
-  svg.innerHTML = html;
 }
 
 function openNotifModal() {
